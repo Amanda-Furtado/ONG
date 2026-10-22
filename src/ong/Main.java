@@ -2,15 +2,15 @@ package ong;
 
 import ong.sistema.*;
 import ong.usuario.*;
-
+import ong.menu.*;
 
 public class Main {
     public static void main (String args[]){
         SistemaUsuario sisUser = new SistemaUsuario();
+        MenuLogin mLogin = new MenuLogin();
+        
+        mLogin.mostrarMenu();
 
-        Usuario user1 = new Voluntario("ABC", "ABC", "ABC");
 
-        sisUser.cadastrarUsuario(user1);
-        sisUser.mostrarUsuarios();
     }
 }
