@@ -7,9 +7,9 @@ import ong.menu.*;
 public class Main {
     public static void main (String args[]){
         SistemaUsuario sisUser = new SistemaUsuario();
-        MenuLogin mLogin = new MenuLogin();
+        MenuPrincipal mPrincipal = new MenuPrincipal();
         
-        mLogin.mostrarMenu();
+        mPrincipal.mostrarMenu();
 
 
     }
