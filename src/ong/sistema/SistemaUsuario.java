@@ -15,7 +15,7 @@ public class SistemaUsuario {
 
     public void mostrarUsuarios(){
         for(Usuario u : todosUsuarios){
-            System.out.printf(u.getNome() + "\n");
+            System.out.printf(u.getNome() + ": " + u.getTipo() + ".\n");
         }
     }
 }

@@ -1,12 +1,9 @@
 package ong.usuario;
 
 public class Veterinario extends Usuario {
-    private final int CPF;
 
-    public Veterinario(String nome, String email, String senha, int cpf){
-        super(nome, email, senha);
-        this.setTipo("VETERINARIO");
-        this.CPF = cpf;
+    public Veterinario(String nome, String email, String senha, String cpf){
+        super(nome, email, senha, CPF);
     }
 
     public void consultarAnimais(){

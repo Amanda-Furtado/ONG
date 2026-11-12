@@ -16,7 +16,7 @@ public class MenuPrincipal {
         // Textos
         JPanel painelTexto = new JPanel();
         painelTexto.setLayout(new BoxLayout(painelTexto, BoxLayout.Y_AXIS));
-        painelTexto.setBorder(BorderFactory.createEmptyBorder(40, 20, 20, 20));
+        painelTexto.setBorder(BorderFactory.createEmptyBorder(40, 20, 20, 40));
 
         JLabel lblLinha1 = new JLabel("Bem vindo ao sistema do");
         JLabel lblLinha2 = new JLabel("Abrigo Amigos Fofos");
