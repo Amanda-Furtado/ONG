@@ -10,6 +10,7 @@ E:\ONG\src\ong\eventos\EventoBeneficente.java
 E:\ONG\src\ong\eventos\FeiraAdocao.java
 E:\ONG\src\ong\eventos\MultiraoLimpeza.java
 E:\ONG\src\ong\menu\MenuAdmin.java
+E:\ONG\src\ong\menu\MenuAnimaisDisponiveis.java
 E:\ONG\src\ong\menu\MenuEntrar.java
 E:\ONG\src\ong\menu\MenuEventos.java
 E:\ONG\src\ong\menu\MenuPrincipal.java

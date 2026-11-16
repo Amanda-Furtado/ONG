@@ -1,4 +1,4 @@
-package service;
+package ong.service;
 
 import java.util.ArrayList;
 import ong.animais.*;
@@ -10,6 +10,10 @@ public class Inventario{
     public Inventario(){
         animais = new ArrayList<>();
         solicitacoes = new ArrayList<>();
+    }
+
+    public ArrayList<Animal> getAnimais() {
+        return this.animais;
     }
 
     public void addAnimal(Animal animal){

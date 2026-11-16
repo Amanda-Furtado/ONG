@@ -1,6 +1,7 @@
 package ong.menu;
 
 import ong.sistema.SistemaUsuario;
+import ong.service.*;
 import ong.UI.*;
 
 import javax.swing.*;
@@ -9,9 +10,11 @@ import java.awt.*;
 
 public class MenuPrincipal {
     private SistemaUsuario sisUser;
+    private Inventario inv;
 
-    public MenuPrincipal(SistemaUsuario sisUser){
+    public MenuPrincipal(SistemaUsuario sisUser, Inventario inv){
         this.sisUser = sisUser;
+        this.inv = inv;
     }
 
     public void mostrarMenu(){
@@ -48,24 +51,20 @@ public class MenuPrincipal {
 
 
         CustomBotao btnEntrar = new CustomBotao("Entrar", e -> {
-            //janela.dispose();
             new MenuEntrar(this.sisUser).mostrarTela();
         });
 
         CustomBotao btnRegistrar = new CustomBotao("Registrar", e -> {
-            janela.dispose();
             JOptionPane.showMessageDialog(null, "Abrindo tela de Registro...");
             // quando tiver uma janela eu boto um comando aq.
         });
 
         CustomBotao btnVisuAnimais = new CustomBotao("Visualizar Animais Disponíveis", e -> {
-            janela.dispose();
-            JOptionPane.showMessageDialog(null, "Abrindo listagem de animais...");
-            // quando tiver uma janela eu boto um comando aq.
+            new MenuAnimaisDisponiveis(inv).mostrarTela();
+
         });
 
         CustomBotao btnSobreSis = new CustomBotao("Sobre o Sistema", e -> {
-            janela.dispose();
             JOptionPane.showMessageDialog(janela, "Sistema de Gerenciamento para ONG - Abrigo Amigos Fofos v1.0, feito por Amanda e Victor!");
             // quando tiver uma janela eu boto um comando aq.
         });
