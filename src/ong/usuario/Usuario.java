@@ -26,7 +26,7 @@ public abstract class Usuario {
         return this.senha.equals(senha);
     }
 
-    public int getCPF(){
+    public String getCPF(){
         return this.CPF;
     }
 }

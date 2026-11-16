@@ -3,7 +3,7 @@ package ong.usuario;
 public class Veterinario extends Usuario {
 
     public Veterinario(String nome, String email, String senha, String cpf){
-        super(nome, email, senha, CPF);
+        super(nome, email, senha, cpf);
     }
 
     public void consultarAnimais(){

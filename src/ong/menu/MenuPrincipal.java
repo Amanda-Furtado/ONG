@@ -1,6 +1,9 @@
 package ong.menu;
-import javax.swing.*;
 
+
+import ong.UI.CustomBotao;
+
+import javax.swing.*;
 import java.awt.*;
 
 
@@ -8,7 +11,7 @@ public class MenuPrincipal {
     
     public void mostrarMenu(){
         JFrame janela = new JFrame();
-        janela.setSize(600, 600);
+        janela.setSize(750, 500);
         janela.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         janela.setLocationRelativeTo(null);
         janela.setLayout(new BorderLayout());
@@ -39,23 +42,29 @@ public class MenuPrincipal {
         painelBotoes.setBorder(BorderFactory.createEmptyBorder(0, 0, 100, 0));
 
 
-        JButton btnEntrar = new JButton("Entrar");
-        JButton btnRegistrar = new JButton("Registrar");
-        JButton btnVisuAnimais = new JButton("Visualizar Animais Disponíveis");
-        JButton btnSobreSis = new JButton("Sobre o Sistema");
-        
-        
-        Font fonteBotoes = new Font("Quicksand", Font.BOLD, 24);
-        btnEntrar.setFont(fonteBotoes);
-        btnRegistrar.setFont(fonteBotoes);
-        btnVisuAnimais.setFont(fonteBotoes);
-        btnSobreSis.setFont(fonteBotoes);
+        CustomBotao btnEntrar = new CustomBotao("Entrar", e -> {
+            janela.dispose();
+            new MenuEntrar().mostrarTela();
+        });
 
-        Dimension dimBotao = new Dimension(300, 36);
-        btnEntrar.setPreferredSize(dimBotao);
-        btnRegistrar.setPreferredSize(dimBotao);
-        btnVisuAnimais.setPreferredSize(dimBotao);
-        btnSobreSis.setPreferredSize(dimBotao);
+        CustomBotao btnRegistrar = new CustomBotao("Registrar", e -> {
+            janela.dispose();
+            JOptionPane.showMessageDialog(null, "Abrindo tela de Registro...");
+            // quando tiver uma janela eu boto um comando aq.
+        });
+
+        CustomBotao btnVisuAnimais = new CustomBotao("Visualizar Animais Disponíveis", e -> {
+            janela.dispose();
+            JOptionPane.showMessageDialog(null, "Abrindo listagem de animais...");
+            // quando tiver uma janela eu boto um comando aq.
+        });
+
+        CustomBotao btnSobreSis = new CustomBotao("Sobre o Sistema", e -> {
+            janela.dispose();
+            JOptionPane.showMessageDialog(janela, "Sistema de Gerenciamento para ONG - Abrigo Amigos Fofos v1.0, feito por Amanda e Victor!");
+            // quando tiver uma janela eu boto um comando aq.
+        });
+       
 
         painelBotoes.add(btnEntrar);
         painelBotoes.add(btnRegistrar);

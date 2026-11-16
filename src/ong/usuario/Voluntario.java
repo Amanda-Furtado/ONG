@@ -1,5 +1,7 @@
 package ong.usuario;
 
+import ong.animais.Animal;
+import ong.eventos.Atividade;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,16 +18,16 @@ public class Voluntario extends Usuario {
         return this.historico;
     }
 
-    public void addAtividade(Atividade atv){
+    public void addAtividadeAtiva(Atividade atv){
         this.atvAtivas.add(atv);
     }
 
-    public void concluirAtividade(Atividade atv){
+    public void concluirAtividadeAtiva(Atividade atv){
         this.historico.add(atv);
         this.atvAtivas.remove(atv);
     }
 
-    public void getAnimaisResponsavel(){
+    public List getAnimaisResponsavel(){
         return this.animaisResponsavel;
     }
 }
