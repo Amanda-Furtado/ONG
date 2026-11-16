@@ -55,8 +55,7 @@ public class MenuPrincipal {
         });
 
         CustomBotao btnRegistrar = new CustomBotao("Registrar", e -> {
-            JOptionPane.showMessageDialog(null, "Abrindo tela de Registro...");
-            // quando tiver uma janela eu boto um comando aq.
+            new MenuRegistrar(this.sisUser).mostrarTela();
         });
 
         CustomBotao btnVisuAnimais = new CustomBotao("Visualizar Animais Disponíveis", e -> {
