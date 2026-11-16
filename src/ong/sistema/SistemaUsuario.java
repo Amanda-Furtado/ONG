@@ -7,7 +7,7 @@ import ong.usuario.Usuario;
 
 
 public class SistemaUsuario {
-    private List<Usuario> todosUsuarios = new ArrayList<>();
+    private ArrayList<Usuario> todosUsuarios = new ArrayList<>();
 
     public void cadastrarUsuario(Usuario u) {
         todosUsuarios.add(u);
@@ -18,4 +18,18 @@ public class SistemaUsuario {
             System.out.printf(u.getNome() + ".\n");
         }
     }
+
+    public Usuario validarLogin(String email, String senha){
+        for (Usuario u : todosUsuarios){
+            if(validarEmail(u, email) && u.validarSenha(senha)){
+                return u;
+            }
+        }
+        return null;
+    }
+
+    public boolean validarEmail(Usuario u, String email){
+        return u.getEmail().equalsIgnoreCase(email.trim());
+    }
+
 }

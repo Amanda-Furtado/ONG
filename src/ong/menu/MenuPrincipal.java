@@ -1,14 +1,19 @@
 package ong.menu;
 
-
-import ong.UI.CustomBotao;
+import ong.sistema.SistemaUsuario;
+import ong.UI.*;
 
 import javax.swing.*;
 import java.awt.*;
 
 
 public class MenuPrincipal {
-    
+    private SistemaUsuario sisUser;
+
+    public MenuPrincipal(SistemaUsuario sisUser){
+        this.sisUser = sisUser;
+    }
+
     public void mostrarMenu(){
         JFrame janela = new JFrame();
         janela.setSize(750, 500);
@@ -43,8 +48,8 @@ public class MenuPrincipal {
 
 
         CustomBotao btnEntrar = new CustomBotao("Entrar", e -> {
-            janela.dispose();
-            new MenuEntrar().mostrarTela();
+            //janela.dispose();
+            new MenuEntrar(this.sisUser).mostrarTela();
         });
 
         CustomBotao btnRegistrar = new CustomBotao("Registrar", e -> {
@@ -72,7 +77,7 @@ public class MenuPrincipal {
         painelBotoes.add(btnSobreSis);
 
         janela.add(painelBotoes, BorderLayout.SOUTH);
-
+        janela.setExtendedState(JFrame.MAXIMIZED_BOTH);
         janela.setVisible(true);
     }
 

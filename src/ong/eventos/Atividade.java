@@ -23,7 +23,8 @@ public abstract class Atividade{
         this.data = data;
         this.local = local;
         this.vagasDisponiveis = vagasDisponiveis;
-        this.voluntariosInscritos = new ArrayList();
+        this.voluntariosInscritos = new ArrayList<>();
+
     }
     
     //vou testar fazer a inscricao aqui, mas se 

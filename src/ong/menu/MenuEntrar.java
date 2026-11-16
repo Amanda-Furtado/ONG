@@ -1,12 +1,21 @@
 package ong.menu;
 
 import ong.UI.*;
+import ong.sistema.SistemaUsuario;
+import ong.usuario.*;
+
+
 
 import javax.swing.*;
 import java.awt.*;
 
 public class MenuEntrar {
+    private SistemaUsuario sisUser;
 
+    public MenuEntrar(SistemaUsuario sisUser){
+        this.sisUser = sisUser;
+    }
+    
     public void mostrarTela() {
         CustomFrame janela = new CustomFrame("Login - Abrigo Amigos Fofos", 720, 480);
 
@@ -23,7 +32,22 @@ public class MenuEntrar {
         CustomBotao btnEntrar = new CustomBotao("Entrar", e -> {
             String email = txtEmail.getText();
             String senha = new String(txtSenha.getPassword());
-            JOptionPane.showMessageDialog(janela, "email: " + email);
+            
+            Usuario userLogado = sisUser.validarLogin(email, senha);
+
+            if(userLogado != null){
+                if(userLogado instanceof Voluntario){
+                    new MenuVoluntario((Voluntario) userLogado).mostrarTela();
+                }else if(userLogado instanceof Veterinario){
+                    new MenuVeterinario((Veterinario) userLogado).mostrarTela();
+                }else{
+                    new MenuAdmin((Administrador) userLogado).mostrarTela();
+                }
+                janela.dispose();
+            }else{
+                JOptionPane.showMessageDialog(janela, "E-mail ou senha inválidos.", "Erro de Login", JOptionPane.ERROR_MESSAGE);
+            }
+
         });
 
         CustomLabel lblEsqueceuSenha = new CustomLabel("<html><u style='color:blue;'>Esqueceu a senha?</u></html>", true);
@@ -49,6 +73,7 @@ public class MenuEntrar {
         painelFormulario.addComEspacamento(lblEsqueceuSenha, 0);
 
         janela.setConteudo(painelFormulario);
+        
         janela.setVisible(true);
     }
 }

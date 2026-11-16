@@ -22,11 +22,12 @@ public abstract class Usuario {
         return this.email;
     }
 
-    public boolean validarSenha(String senha){
-        return this.senha.equals(senha);
-    }
-
     public String getCPF(){
         return this.CPF;
     }
+
+    public boolean validarSenha(String senhaDigitada){
+        return this.senha != null && this.senha.equals(senhaDigitada);
+    }
+    
 }
