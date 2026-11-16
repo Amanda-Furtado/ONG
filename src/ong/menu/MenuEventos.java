@@ -27,7 +27,7 @@ public class MenuEventos {
         
   
         CustomBotao btnParticipar = new CustomBotao("Participar", e -> {
-            JOptionPane.showMessageDialog(janela, "participando...", JOptionPane.MESSAGE);
+            JOptionPane.showMessageDialog(janela, "participando...");
         });
 
 
