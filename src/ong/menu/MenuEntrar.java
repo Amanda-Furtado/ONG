@@ -1,10 +1,6 @@
 package ong.menu;
 
-import ong.UI.CustomBotao;
-import ong.UI.CustomLabel;
-import ong.UI.CustomFormPanel;
-import ong.UI.CustomTextField;
-import ong.UI.CustomPasswordField;
+import ong.UI.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,13 +8,7 @@ import java.awt.*;
 public class MenuEntrar {
 
     public void mostrarTela() {
-        JFrame janela = new JFrame("Login - Abrigo Amigos Fofos");
-        janela.setSize(720, 480);
-        janela.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        janela.setLocationRelativeTo(null);
-
-        JPanel painelPrincipal = new JPanel(new GridBagLayout());
-        painelPrincipal.setBackground(Color.WHITE);
+        CustomFrame janela = new CustomFrame("Login - Abrigo Amigos Fofos", 720, 480);
 
         CustomFormPanel painelFormulario = new CustomFormPanel(720, 480);
 
@@ -58,8 +48,7 @@ public class MenuEntrar {
 
         painelFormulario.addComEspacamento(lblEsqueceuSenha, 0);
 
-        painelPrincipal.add(painelFormulario, new GridBagConstraints());
-        janela.add(painelPrincipal);
+        janela.setConteudo(painelFormulario);
         janela.setVisible(true);
     }
 }
