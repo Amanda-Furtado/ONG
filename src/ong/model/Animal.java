@@ -1,18 +1,19 @@
-package ong.animal;
+package model;
 
+import java.util.ArrayList;
 
-public abstract class Animal {
-    private int id;
+public abstract class Animal{
+    private final int id;
     private String nome;
     private String raca;
     private int idade;
-    private Porte porte;
+    private String porte;
     private String estadoSaude;
     private String dataResgate;
-    private StatusAdocao statusAdocao;
+    private String statusAdocao;
 
-    public Animal(int id, String nome, String raca, int idade, Porte porte, 
-                  String estadoSaude, String dataResgate, StatusAdocao statusAdocao) {
+    public Animal(int id, String nome, String raca, int idade, String porte, 
+                  String estadoSaude, String dataResgate, String statusAdocao){
         this.id = id;
         this.nome = nome;
         this.raca = raca;
@@ -23,7 +24,6 @@ public abstract class Animal {
         this.statusAdocao = statusAdocao;
     }
 
-    public abstract String getEspecie();
 
     public int getId(){
         return id;
@@ -46,10 +46,10 @@ public abstract class Animal {
     public void setIdade(int idade){ 
         this.idade = idade; 
     }
-    public Porte getPorte(){ 
+    public String getPorte(){ 
         return porte; 
     }
-    public void setPorte(Porte porte){ 
+    public void setPorte(String porte){ 
         this.porte = porte; 
     }
     public String getEstadoSaude(){ 
@@ -64,16 +64,30 @@ public abstract class Animal {
     public void setDataResgate(String dataResgate){ 
         this.dataResgate = dataResgate; 
     }
-    public StatusAdocao getStatusAdocao(){ 
+    public String getStatusAdocao(){ 
         return statusAdocao; 
     }
-    public void setStatusAdocao(StatusAdocao statusAdocao){ 
+    public void setStatusAdocao(String statusAdocao){ 
         this.statusAdocao = statusAdocao; 
     }
-
-    @Override
-    public String toString() {
-        return String.format("[%d] %s (%s - %s) | Idade: %d | Porte: %s | Saude: %s | Data: %s | Status: %s", 
-                id, nome, getEspecie(), raca, idade, porte, estadoSaude, dataResgate, statusAdocao);
+    public String getEspecie(){
+        return this.getClass().getSimpleName();
     }
+
+    @Override 
+    public String toString(){
+        return "Animal {" +
+                "id = " + id +
+                ", nome = " + nome +
+                ", especie = " + getEspecie() +
+                ", raca = " + raca +
+                ", idade = " + idade +
+                ", porte = " + porte +
+                ", estadoSaude = " + estadoSaude +
+                ", dataResgate = " + dataResgate +
+                ", statusAdocao = " + statusAdocao +
+                '}';
+    }
+//MODULO 4 -----------------------------------------------------
+
 }
