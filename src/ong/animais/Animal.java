@@ -89,5 +89,32 @@ public abstract class Animal{
                 '}';
     }
 //MODULO 4 -----------------------------------------------------
+    private ArrayList<ProcedimentoMedico> historicoProcedimentos = new ArrayList<>();
+
+        public void adicionarProcedimento(ProcedimentoMedico procedimento){
+            this.historicoProcedimentos.add(procedimento);
+        }
+
+        public ArrayList<ProcedimentoMedico> getHistoricoProcedimentos(){
+            return historicoProcedimentos;
+        }
+    private ArrayList<Vacina> carteiraVacinacao = new ArrayList<>();
+
+    public void adicionarVacina(Vacina vacina){
+        this.carteiraVacinacao.add(vacina);
+    }
+
+    public ArrayList<Vacina> getCarteiraVacinacao(){
+        return carteiraVacinacao;
+    }
+    private ArrayList<Consulta> historicoConsultas = new ArrayList<>();
+
+    public void adicionarConsulta(Consulta consulta){
+        this.historicoConsultas.add(consulta);
+    }
+
+    public ArrayList<Consulta> getHistoricoConsultas(){
+        return historicoConsultas;
+    }
 
 }

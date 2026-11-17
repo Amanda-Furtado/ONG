@@ -1,7 +1,8 @@
-package service;
+package ong.service;
 
 import java.util.ArrayList;
 import ong.animais.*;
+import ong.usuario.*;
 
 public class Inventario{
     private ArrayList<Animal> animais;
@@ -29,7 +30,7 @@ public class Inventario{
         Animal animal = buscarPorId(id);
         if(animal != null){
             if(animal.getStatusAdocao().equalsIgnoreCase("Adotado")){
-                System.out.println("Erro: Um animal adotado não pode ser removido do sistema/histórico.");
+                System.out.println("Erro: Um animal adotado nao pode ser removido do sistema/historico.");
                 return false;
             }
             animais.remove(animal);
@@ -66,11 +67,9 @@ public class Inventario{
         }
         return resultados;
     }
-// SISTEMA DE BUSCA POR NOME (ou parte do nome)
     public ArrayList<Animal> buscarPorNome(String termoBusca){
         ArrayList<Animal> resultados = new ArrayList<>();
         for(Animal animal : animais){
-            // toLowerCase ajuda a encontrar independente de maiúsculas/minúsculas
             if(animal.getNome().toLowerCase().contains(termoBusca.toLowerCase())){
                 resultados.add(animal);
             }
@@ -86,25 +85,27 @@ public class Inventario{
 // MODULO 3 COMEÇO ---------------------------------------------------------------------------------------------------------------------------------------------
     public boolean solicitarAdocao(int idSolicitacao, int idAnimal, String nomeCandidato, String cpfCandidato){
         Animal animal = buscarPorId(idAnimal);
-        if(animal != null){
-            // REGRA: Um animal adotado não pode receber novas solicitações
-            if(animal.getStatusAdocao().equalsIgnoreCase("Adotado")){
-                System.out.println("Erro: O animal " + animal.getNome() + " já foi adotado e não aceita novas solicitações.");
-                return false;
-            }
-            
-            SolicitacaoAdocao novaSol = new SolicitacaoAdocao(idSolicitacao, animal, nomeCandidato, cpfCandidato);
-            solicitacoes.add(novaSol);
-            System.out.println("Solicitação de adoção criada para o(a) " + animal.getNome() + " em nome de " + nomeCandidato);
-            return true;
+        if(animal == null){
+            throw new IllegalArgumentException("Erro: Animal nao encontrado.");
         }
-        return false;
+
+        if(animal.getEstadoSaude().equalsIgnoreCase("Critico") || animal.getEstadoSaude().equalsIgnoreCase("Tratamento Critico")){
+            throw new IllegalStateException("Erro: O animal " + animal.getNome() + " esta em tratamento critico e nao pode ser adotado.");
+        }
+
+        if(!animal.getStatusAdocao().equalsIgnoreCase("Disponivel")){
+            throw new IllegalStateException("Erro: O animal " + animal.getNome() + " esta indisponivel para adocao (Status: " + animal.getStatusAdocao() + ").");
+        }
+
+        SolicitacaoAdocao novaSol = new SolicitacaoAdocao(idSolicitacao, animal, nomeCandidato, cpfCandidato);
+        solicitacoes.add(novaSol);
+        System.out.println("Solicitacao de adocao criada para o(a) " + animal.getNome() + " em nome de " + nomeCandidato);
+        return true;
     }
-    // Método para exibir todas as solicitações/candidatos registrados
     public void exibirSolicitacoes(){
-        System.out.println("--- Lista de Candidatos e Solicitações ---");
+        System.out.println("--- Lista de Candidatos e Solicitacoes ---");
         for(SolicitacaoAdocao sol : solicitacoes){
-            System.out.println("ID Solicitação: " + sol.getIdSolicitacao() + 
+            System.out.println("ID Solicitacao: " + sol.getIdSolicitacao() + 
                                " | Candidato: " + sol.getNomeCandidato() + 
                                " (CPF: " + sol.getCpfCandidato() + ")" +
                                " | Animal: " + sol.getAnimal().getNome() + 
@@ -112,7 +113,6 @@ public class Inventario{
         }
     }
 
-    // Método para buscar solicitações pelo CPF do candidato
     public ArrayList<SolicitacaoAdocao> buscarSolicitacoesPorCpf(String cpf){
         ArrayList<SolicitacaoAdocao> resultados = new ArrayList<>();
         for(SolicitacaoAdocao sol : solicitacoes){
@@ -122,7 +122,6 @@ public class Inventario{
         }
         return resultados;
     }
-    // Método auxiliar para buscar uma solicitação pelo ID dela
     public SolicitacaoAdocao buscarSolicitacaoPorId(int idSolicitacao){
         for(SolicitacaoAdocao sol : solicitacoes){
             if(sol.getIdSolicitacao() == idSolicitacao){
@@ -131,7 +130,7 @@ public class Inventario{
         }
         return null;
     }
-    // REGRA: Apenas administradores podem concluir/aprovar uma adoção
+
     public boolean aprovarAdocao(int idSolicitacao, boolean isAdmin){
         if(!isAdmin){
             System.out.println("Acesso negado: Apenas administradores podem aprovar uma adoção.");
@@ -149,7 +148,6 @@ public class Inventario{
         return false;
     }
 
-    // Método para rejeitar uma solicitação de adoção
     public boolean rejeitarAdocao(int idSolicitacao, boolean isAdmin){
         if(!isAdmin){
             System.out.println("Acesso negado: Apenas administradores podem rejeitar uma adoção.");
@@ -164,7 +162,7 @@ public class Inventario{
         }
         return false;
     }
-    // Método para exibir apenas as adoções com status "Aprovado"
+
     public void exibirHistoricoAdocoesAprovadas(){
         System.out.println("--- Histórico de Adoções com Status Aprovado ---");
         boolean encontrou = false;
@@ -183,7 +181,7 @@ public class Inventario{
             System.out.println("Nenhuma adoção aprovada encontrada.");
         }
     }
-    // REGRA: Registro de devolução quando necessário (sem motivo)
+
     public boolean registrarDevolucao(int idAnimal){
         Animal animal = buscarPorId(idAnimal);
         if(animal != null && animal.getStatusAdocao().equalsIgnoreCase("Adotado")){
@@ -195,7 +193,138 @@ public class Inventario{
         return false;
     }
 // MODULO 3 FIM ---------------------------------------------------------------------------------------------------------------------------------------------
-// MODULO 4
+//MODULO 4 COMECO -----------------------------------------------------
+    private ArrayList<Consulta> historicoConsultas = new ArrayList<>();
 
+    public void adicionarConsulta(Consulta consulta){
+        this.historicoConsultas.add(consulta);
+    }
+
+    public ArrayList<Consulta> getHistoricoConsultas(){
+        return historicoConsultas;
+    }
+    public boolean registrarConsulta(int idConsulta, int idAnimal, Usuario usuarioLogado, String data, String diagnostico, String prescricao, String novoEstadoSaude){
+        if(!(usuarioLogado instanceof Veterinario)){
+            System.out.println("Acesso negado: Apenas veterinarios podem registrar consultas.");
+            return false;
+        }
+
+        Animal animal = buscarPorId(idAnimal);
+        if(animal != null){
+            Veterinario vet = (Veterinario) usuarioLogado;
+            Consulta novaConsulta = new Consulta(idConsulta, animal, vet, data, diagnostico, prescricao);
+            animal.adicionarConsulta(novaConsulta);
+            animal.setEstadoSaude(novoEstadoSaude);
+            System.out.println("Consulta #" + idConsulta + " registrada para " + animal.getNome() + " pelo(a) Dr(a). " + vet.getNome());
+            return true;
+        }
+        System.out.println("Erro: Animal nao encontrado.");
+        return false;
+    }
+    public boolean registrarProcedimento(int idProcedimento, int idAnimal, Usuario usuarioLogado, String tipo, String descricao, String data, String status){
+        if(!(usuarioLogado instanceof Veterinario)){
+            System.out.println("Acesso negado: Apenas veterinarios podem registrar procedimentos medicos.");
+            return false;
+        }
+
+        Animal animal = buscarPorId(idAnimal);
+        if(animal != null){
+            Veterinario vet = (Veterinario) usuarioLogado;
+            ProcedimentoMedico proc = new ProcedimentoMedico(idProcedimento, animal, vet, tipo, descricao, data, status);
+            animal.adicionarProcedimento(proc);
+            System.out.println("Procedimento (" + tipo + ") registrado para " + animal.getNome() + ".");
+            return true;
+        }
+        System.out.println("Erro: Animal nao encontrado.");
+        return false;
+    }
+
+    public boolean atualizarStatusTratamento(int idAnimal, int idProcedimento, Usuario usuarioLogado, String novoStatus, String novoEstadoSaude){
+        if(!(usuarioLogado instanceof Veterinario)){
+            System.out.println("Acesso negado: Apenas veterinarios podem atualizar tratamentos.");
+            return false;
+        }
+
+        Animal animal = buscarPorId(idAnimal);
+        if(animal != null){
+            for(ProcedimentoMedico p : animal.getHistoricoProcedimentos()){
+                if(p.getIdProcedimento() == idProcedimento){
+                    p.setStatus(novoStatus);
+                    animal.setEstadoSaude(novoEstadoSaude);
+                    System.out.println("Tratamento #" + idProcedimento + " atualizado para: " + novoStatus);
+                    return true;
+                }
+            }
+            System.out.println("Erro: Procedimento nao encontrado para este animal.");
+            return false;
+        }
+        System.out.println("Erro: Animal nao encontrado.");
+        return false;
+    }
+
+    public void exibirHistoricoMedicoAnimal(int idAnimal){
+        Animal animal = buscarPorId(idAnimal);
+        if(animal != null){
+            System.out.println("--- Prontuario Medico Completo: " + animal.getNome() + " ---");
+            System.out.println("ID: " + animal.getId() + 
+                               " | Especie: " + animal.getEspecie() + 
+                               " | Raca: " + animal.getRaca() + 
+                               " | Estado de Saude Atual: " + animal.getEstadoSaude());
+
+            System.out.println("--- Historico de Consultas ---");
+            if(animal.getHistoricoConsultas().isEmpty()){
+                System.out.println("Nenhuma consulta registrada.");
+            }else{
+                for(Consulta c : animal.getHistoricoConsultas()){
+                    System.out.println(c.toString());
+                }
+            }
+
+            System.out.println("--- Historico de Procedimentos e Tratamentos ---");
+            if(animal.getHistoricoProcedimentos().isEmpty()){
+                System.out.println("Nenhum procedimento registrado.");
+            }
+            else{
+                for(ProcedimentoMedico p : animal.getHistoricoProcedimentos()){
+                    System.out.println(p.toString());
+                }
+            }
+            System.out.println("--- Carteira de Vacinacao ---");
+            if(animal.getCarteiraVacinacao().isEmpty()){
+                System.out.println("Nenhuma vacina registrada.");
+            }else{
+                for(Vacina v : animal.getCarteiraVacinacao()){
+                    System.out.println(v.toString());
+                }
+            }
+        }else{
+            System.out.println("Erro: Animal nao encontrado.");
+        }
+    }
+
+    public boolean registrarVacinacao(int idVacina, int idAnimal, Usuario usuarioLogado, String nomeVacina, String dose, String dataAplicacao, String dataProximaDose){
+        if(!(usuarioLogado instanceof Veterinario)){
+            System.out.println("Acesso negado: Apenas veterinarios podem registrar vacinacao.");
+            return false;
+        }
+
+        Animal animal = buscarPorId(idAnimal);
+        if(animal != null){
+            for(Vacina v : animal.getCarteiraVacinacao()){
+                if(v.getNomeVacina().equalsIgnoreCase(nomeVacina) && v.getDataAplicacao().equals(dataAplicacao)){
+                    System.out.println("Erro: Vacina " + nomeVacina + " ja registrada na data " + dataAplicacao + " para este animal.");
+                    return false;
+                }
+            }
+
+            Veterinario vet = (Veterinario) usuarioLogado;
+            Vacina novaVacina = new Vacina(idVacina, animal, vet, nomeVacina, dose, dataAplicacao, dataProximaDose);
+            animal.adicionarVacina(novaVacina);
+            System.out.println("Vacina " + nomeVacina + " (" + dose + ") registrada para " + animal.getNome() + ".");
+            return true;
+        }
+        System.out.println("Erro: Animal nao encontrado.");
+        return false;
+    }
 }
 

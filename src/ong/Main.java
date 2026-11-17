@@ -1,9 +1,8 @@
 package ong;
 
+import ong.menu.*;
 import ong.sistema.*;
 import ong.usuario.*;
-import ong.sistema.*;
-import ong.menu.*;
 
 public class Main {
     public static void main (String args[]){
