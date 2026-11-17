@@ -46,12 +46,8 @@ public class MenuAdmin {
             abrirJanelaGerenciarEventos();
         });
 
-        CustomBotao btnRelatorios = new CustomBotao("Relatórios Gerais", e -> {
-            abrirJanelaRelatorios();
-        });
-
-        CustomBotao btnEstatisticas = new CustomBotao("Estatísticas do Abrigo", e -> {
-            abrirJanelaEstatisticas();
+        CustomBotao btnRelatorios = new CustomBotao("Relatórios e Estatísticas", e -> {
+            new MenuRelatorios(sisUser, inv).mostrarTela();
         });
 
         CustomBotao btnNotificacoes = new CustomBotao("Notificações e Avisos", e -> {
@@ -63,16 +59,14 @@ public class MenuAdmin {
         btnAprovarAdocoes.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnGerenciarEventos.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnRelatorios.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnEstatisticas.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnNotificacoes.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        painelFormulario.addComEspacamento(lblTitulo, 32);
-        painelFormulario.addComEspacamento(btnGerenciarAnimais, 16);
-        painelFormulario.addComEspacamento(btnGerenciarUsuarios, 16);
-        painelFormulario.addComEspacamento(btnAprovarAdocoes, 16);
-        painelFormulario.addComEspacamento(btnGerenciarEventos, 16);
-        painelFormulario.addComEspacamento(btnRelatorios, 16);
-        painelFormulario.addComEspacamento(btnEstatisticas, 16);
+        painelFormulario.addComEspacamento(lblTitulo, 36);
+        painelFormulario.addComEspacamento(btnGerenciarAnimais, 18);
+        painelFormulario.addComEspacamento(btnGerenciarUsuarios, 18);
+        painelFormulario.addComEspacamento(btnAprovarAdocoes, 18);
+        painelFormulario.addComEspacamento(btnGerenciarEventos, 18);
+        painelFormulario.addComEspacamento(btnRelatorios, 18);
         painelFormulario.addComEspacamento(btnNotificacoes, 0);
 
         janela.setConteudo(painelFormulario);
@@ -580,89 +574,5 @@ public class MenuAdmin {
 
         tela.setConteudo(painelPrincipal);
         tela.setVisible(true);
-    }
-
-    private void abrirJanelaRelatorios() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("=== RELATÓRIO GERAL DO ABRIGO AMIGOS FOFOS ===\n\n");
-
-        sb.append("--- USUÁRIOS CADASTRADOS ---\n");
-        for (Usuario u : sisUser.getTodosUsuarios()) {
-            sb.append(u.getClass().getSimpleName()).append(": ").append(u.getNome())
-              .append(" | CPF: ").append(u.getCpf()).append(" | E-mail: ").append(u.getEmail()).append("\n");
-            if (u instanceof Voluntario) {
-                Voluntario v = (Voluntario) u;
-                sb.append("   Atividades Ativas: ").append(v.getAtvAtivas().size())
-                  .append(" | Concluídas: ").append(v.getHistorico().size()).append("\n");
-            }
-        }
-
-        sb.append("\n--- ANIMAIS NO INVENTÁRIO ---\n");
-        for (Animal a : inv.getAnimais()) {
-            sb.append("#").append(String.format("%02d", a.getId())).append(" ").append(a.getNome())
-              .append(" (").append(a.getEspecie()).append(") - Saúde: ").append(a.getEstadoSaude())
-              .append(" | Status: ").append(a.getStatusAdocao()).append("\n");
-        }
-
-        sb.append("\n--- HISTÓRICO DE ADOÇÕES APROVADAS ---\n");
-        for (SolicitacaoAdocao sol : inv.getSolicitacoes()) {
-            if (sol.getStatus().equalsIgnoreCase("Aprovado")) {
-                sb.append("Solicitação #").append(String.format("%04d", sol.getIdSolicitacao()))
-                  .append(" | Animal: ").append(sol.getAnimal().getNome())
-                  .append(" | Adotante: ").append(sol.getNomeCandidato()).append("\n");
-            }
-        }
-
-        JTextArea area = new JTextArea(sb.toString(), 22, 54);
-        area.setFont(new Font("Quicksand", Font.PLAIN, 13));
-        area.setEditable(false);
-        JOptionPane.showMessageDialog(null, new JScrollPane(area), "Relatórios Gerais", JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    private void abrirJanelaEstatisticas() {
-        int totalAnimais = inv.getAnimais().size();
-        int disponiveis = 0;
-        int adotados = 0;
-        int emTratamento = 0;
-
-        for (Animal a : inv.getAnimais()) {
-            String st = a.getStatusAdocao().toLowerCase();
-            if (st.contains("disponivel") || st.contains("disponível")) {
-                disponiveis++;
-            } else if (st.contains("adotado")) {
-                adotados++;
-            } else {
-                emTratamento++;
-            }
-        }
-
-        int totalSolicitacoes = inv.getSolicitacoes().size();
-        int pendentes = 0;
-        int aprovadas = 0;
-        int rejeitadas = 0;
-
-        for (SolicitacaoAdocao s : inv.getSolicitacoes()) {
-            if (s.getStatus().equalsIgnoreCase("Pendente")) {
-                pendentes++;
-            } else if (s.getStatus().equalsIgnoreCase("Aprovado")) {
-                aprovadas++;
-            } else {
-                rejeitadas++;
-            }
-        }
-
-        String stats = "ESTATÍSTICAS DO ABRIGO\n\n" +
-                       "Total de Animais Registrados: " + totalAnimais + "\n" +
-                       "  - Disponíveis para Adoção: " + disponiveis + "\n" +
-                       "  - Adotados: " + adotados + "\n" +
-                       "  - Em Tratamento / Indisponíveis: " + emTratamento + "\n\n" +
-                       "Total de Usuários: " + sisUser.getTodosUsuarios().size() + "\n" +
-                       "Total de Atividades Agendadas: " + inv.getAtividades().size() + "\n\n" +
-                       "Solicitações de Adoção: " + totalSolicitacoes + "\n" +
-                       "  - Pendentes: " + pendentes + "\n" +
-                       "  - Aprovadas: " + aprovadas + "\n" +
-                       "  - Rejeitadas: " + rejeitadas;
-
-        JOptionPane.showMessageDialog(null, stats, "Estatísticas", JOptionPane.INFORMATION_MESSAGE);
     }
 }

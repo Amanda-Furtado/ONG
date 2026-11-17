@@ -2204,3 +2204,3729 @@ public class Voluntario extends Usuario {
 
 
 
+=== ARQUIVO: E:\ONG\src\ong\Main.java ===
+package ong;
+
+import ong.menu.*;
+import ong.sistema.*;
+import ong.animais.*;
+import ong.eventos.*;
+import ong.usuario.*;
+import ong.service.*;
+
+public class Main {
+    public static void main(String[] args) {
+        SistemaUsuario sisUser = new SistemaUsuario();
+        Inventario sisInventario = new Inventario();
+
+        Usuario voluntario1 = new Voluntario("Marina Gomes", "abc@gmail.com", "123456", "11122233344");
+        Usuario voluntario2 = new Voluntario("Lucas Pereira", "lucas@gmail.com", "123456", "55566677788");
+        Usuario veterinario1 = new Veterinario("Carla Machado", "vet.carlam@gmail.com", "abcdef", "12312312399");
+        Usuario admin1 = new Administrador("Mário da Silva", "quemario@gmail.com", "senha1", "99988877700");
+
+        Cachorro cachorro1 = new Cachorro(
+            1,
+            "Maicon",
+            "Labrador",
+            3,
+            "Grande",
+            "Saudável e vacinado",
+            "10/05/2026",
+            "Disponível"
+        );
+
+        Gato gato1 = new Gato(
+            2,
+            "Dog",
+            "Siamês",
+            2,
+            "Pequeno",
+            "Castrada e vermifugada",
+            "22/08/2026",
+            "Disponível"
+        );
+
+        Outros outro1 = new Outros(
+            3,
+            "Macarrao",
+            "Coelho Mini Lop",
+            1,
+            "Pequeno",
+            "Em recuperação",
+            "04/11/2026",
+            "Em tratamento"
+        );
+
+        sisUser.cadastrarUsuario(voluntario1);
+        sisUser.cadastrarUsuario(voluntario2);
+        sisUser.cadastrarUsuario(veterinario1);
+        sisUser.cadastrarUsuario(admin1);
+
+        sisInventario.addAnimal(gato1);
+        sisInventario.addAnimal(cachorro1);
+        sisInventario.addAnimal(outro1);
+
+        sisInventario.registrarVacinacao(1, 1, veterinario1, "V10 Polivalente", "Reforço Anual", "25/11/2025", "25/11/2026");
+
+        sisInventario.addAtividade(new MultiraoLimpeza(1, "Mutirão de Sábado", "Limpeza geral dos canis e gatis", "21/11/2026", "Sede do Abrigo", 10));
+        sisInventario.addAtividade(new CampanhaVacinacao(2, "Vacinação Antirrábica", "Aplicação gratuita de vacinas", "28/11/2026", "Praça Central", 15));
+        sisInventario.addAtividade(new FeiraAdocao(3, "Feira Amigos Fofos", "Feira de adoção responsável", "05/12/2026", "Parque Municipal", 8));
+        sisInventario.addAtividade(new EventoBeneficente(4, "Bazar Solidário", "Arrecadação de ração e fundos", "12/12/2026", "Centro Comunitário", 12));
+
+        sisInventario.registrarNotificacao("Aviso Geral do Abrigo", "Reunião mensal da equipe marcada para sexta-feira às 18h na sede.", "16/11/2026", null);
+
+        MenuPrincipal mPrincipal = new MenuPrincipal(sisUser, sisInventario);
+        mPrincipal.mostrarMenu();
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\animais\Animal.java ===
+package ong.animais;
+
+import java.util.ArrayList;
+
+public abstract class Animal{
+    private final int id;
+    private String nome;
+    private String raca;
+    private int idade;
+    private String porte;
+    private String estadoSaude;
+    private String dataResgate;
+    private String statusAdocao;
+
+    public Animal(int id, String nome, String raca, int idade, String porte, 
+                  String estadoSaude, String dataResgate, String statusAdocao){
+        this.id = id;
+        this.nome = nome;
+        this.raca = raca;
+        this.idade = idade;
+        this.porte = porte;
+        this.estadoSaude = estadoSaude;
+        this.dataResgate = dataResgate;
+        this.statusAdocao = statusAdocao;
+    }
+
+
+    public int getId(){
+        return id;
+    }
+    public String getNome(){
+        return nome;
+    }
+    public void setNome(String nome){ 
+        this.nome = nome; 
+    }
+    public String getRaca(){
+        return raca; 
+    }
+    public void setRaca(String raca){
+        this.raca = raca;
+    }
+    public int getIdade(){
+        return idade; 
+    }
+    public void setIdade(int idade){ 
+        this.idade = idade; 
+    }
+    public String getPorte(){ 
+        return porte; 
+    }
+    public void setPorte(String porte){ 
+        this.porte = porte; 
+    }
+    public String getEstadoSaude(){ 
+        return estadoSaude; 
+    }
+    public void setEstadoSaude(String estadoSaude){ 
+        this.estadoSaude = estadoSaude; 
+    }
+    public String getDataResgate(){ 
+        return dataResgate; 
+    }
+    public void setDataResgate(String dataResgate){ 
+        this.dataResgate = dataResgate; 
+    }
+    public String getStatusAdocao(){ 
+        return statusAdocao; 
+    }
+    public void setStatusAdocao(String statusAdocao){ 
+        this.statusAdocao = statusAdocao; 
+    }
+    public String getEspecie(){
+        return this.getClass().getSimpleName();
+    }
+
+    @Override 
+    public String toString(){
+        return "Animal {" +
+                "id = " + id +
+                ", nome = " + nome +
+                ", especie = " + getEspecie() +
+                ", raca = " + raca +
+                ", idade = " + idade +
+                ", porte = " + porte +
+                ", estadoSaude = " + estadoSaude +
+                ", dataResgate = " + dataResgate +
+                ", statusAdocao = " + statusAdocao +
+                '}';
+    }
+//MODULO 4 -----------------------------------------------------
+    private ArrayList<ProcedimentoMedico> historicoProcedimentos = new ArrayList<>();
+
+        public void adicionarProcedimento(ProcedimentoMedico procedimento){
+            this.historicoProcedimentos.add(procedimento);
+        }
+
+        public ArrayList<ProcedimentoMedico> getHistoricoProcedimentos(){
+            return historicoProcedimentos;
+        }
+    private ArrayList<Vacina> carteiraVacinacao = new ArrayList<>();
+
+    public void adicionarVacina(Vacina vacina){
+        this.carteiraVacinacao.add(vacina);
+    }
+
+    public ArrayList<Vacina> getCarteiraVacinacao(){
+        return carteiraVacinacao;
+    }
+    private ArrayList<Consulta> historicoConsultas = new ArrayList<>();
+
+    public void adicionarConsulta(Consulta consulta){
+        this.historicoConsultas.add(consulta);
+    }
+
+    public ArrayList<Consulta> getHistoricoConsultas(){
+        return historicoConsultas;
+    }
+
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\animais\Cachorro.java ===
+package ong.animais;
+public class Cachorro extends Animal{
+
+    public Cachorro(int id, String nome, String raca, int idade, String porte, 
+                    String estadoSaude, String dataResgate, String statusAdocao){
+        super(id, nome, raca, idade, porte, estadoSaude, dataResgate, statusAdocao);
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\animais\Consulta.java ===
+package ong.animais;
+
+import ong.usuario.Veterinario;
+
+public class Consulta{
+    private final int idConsulta;
+    private Animal animal;
+    private Veterinario veterinario;
+    private String data;
+    private String diagnostico;
+    private String prescricao;
+
+    public Consulta(int idConsulta, Animal animal, Veterinario veterinario, String data, String diagnostico, String prescricao){
+        this.idConsulta = idConsulta;
+        this.animal = animal;
+        this.veterinario = veterinario;
+        this.data = data;
+        this.diagnostico = diagnostico;
+        this.prescricao = prescricao;
+    }
+
+    public int getIdConsulta(){
+        return idConsulta;
+    }
+
+    public Animal getAnimal(){
+        return animal;
+    }
+
+    public Veterinario getVeterinario(){
+        return veterinario;
+    }
+
+    public String getData(){
+        return data;
+    }
+
+    public String getDiagnostico(){
+        return diagnostico;
+    }
+
+    public String getPrescricao(){
+        return prescricao;
+    }
+
+    @Override
+    public String toString(){
+        return "Consulta {" +
+                "idConsulta = " + idConsulta +
+                ", animal = " + animal.getNome() +
+                ", veterinario = " + veterinario.getNome() +
+                ", data = " + data +
+                ", diagnostico = " + diagnostico +
+                ", prescricao = " + prescricao +
+                '}';
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\animais\Gato.java ===
+package ong.animais;
+public class Gato extends Animal{
+
+    public Gato(int id, String nome, String raca, int idade, String porte, 
+                    String estadoSaude, String dataResgate, String statusAdocao){
+        super(id, nome, raca, idade, porte, estadoSaude, dataResgate, statusAdocao);
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\animais\Outros.java ===
+package ong.animais;
+
+public class Outros extends Animal{
+
+    public Outros(int id, String nome, String raca, int idade, String porte, 
+                    String estadoSaude, String dataResgate, String statusAdocao){
+        super(id, nome, raca, idade, porte, estadoSaude, dataResgate, statusAdocao);
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\animais\ProcedimentoMedico.java ===
+package ong.animais;
+
+import ong.usuario.Veterinario;
+
+public class ProcedimentoMedico{
+    private final int idProcedimento;
+    private Animal animal;
+    private Veterinario veterinario;
+    private String tipo;
+    private String descricao;
+    private String data;
+    private String status;
+
+    public ProcedimentoMedico(int idProcedimento, Animal animal, Veterinario veterinario, String tipo, String descricao, String data, String status){
+        this.idProcedimento = idProcedimento;
+        this.animal = animal;
+        this.veterinario = veterinario;
+        this.tipo = tipo;
+        this.descricao = descricao;
+        this.data = data;
+        this.status = status;
+    }
+
+    public int getIdProcedimento(){
+        return idProcedimento;
+    }
+
+    public Animal getAnimal(){
+        return animal;
+    }
+
+    public Veterinario getVeterinario(){
+        return veterinario;
+    }
+
+    public String getTipo(){
+        return tipo;
+    }
+
+    public String getDescricao(){
+        return descricao;
+    }
+
+    public String getData(){
+        return data;
+    }
+
+    public String getStatus(){
+        return status;
+    }
+
+    public void setStatus(String status){
+        this.status = status;
+    }
+
+    @Override
+    public String toString(){
+        return "ProcedimentoMedico {" +
+                "id = " + idProcedimento +
+                ", tipo = " + tipo +
+                ", descricao = " + descricao +
+                ", data = " + data +
+                ", status = " + status +
+                ", veterinario = Dr(a). " + veterinario.getNome() +
+                '}';
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\animais\SolicitacaoAdocao.java ===
+package ong.animais;
+
+public class SolicitacaoAdocao{
+    private int idSolicitacao;
+    private Animal animal;
+    private String nomeCandidato;
+    private String cpfCandidato;
+    private String status;
+
+    public SolicitacaoAdocao(int idSolicitacao, Animal animal, String nomeCandidato, String cpfCandidato){
+        this.idSolicitacao = idSolicitacao;
+        this.animal = animal;
+        this.nomeCandidato = nomeCandidato;
+        this.cpfCandidato = cpfCandidato;
+        this.status = "Pendente"; // Toda solicitação nasce como pendente
+    }
+
+    public int getIdSolicitacao(){
+        return idSolicitacao;
+    }
+    public Animal getAnimal(){
+        return animal;
+    }
+    public String getNomeCandidato(){
+        return nomeCandidato;
+    }
+    public String getCpfCandidato(){
+        return cpfCandidato;
+    }
+    public String getStatus(){
+        return status;
+    }
+    public void setStatus(String status){
+        this.status = status;
+    }
+
+    @Override
+    public String toString(){
+        return "SolicitacaoAdocao {" +
+                "idSolicitacao=" + idSolicitacao +
+                ", animal=" + animal.getNome() +
+                ", candidato='" + nomeCandidato + '\'' +
+                ", status='" + status + '\'' +
+                '}';
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\animais\Vacina.java ===
+package ong.animais;
+
+import ong.usuario.Veterinario;
+
+public class Vacina{
+    private final int idVacina;
+    private Animal animal;
+    private Veterinario veterinario;
+    private String nomeVacina; 
+    private String dose; 
+    private String dataAplicacao;
+    private String dataProximaDose;
+
+    public Vacina(int idVacina, Animal animal, Veterinario veterinario, String nomeVacina, String dose, String dataAplicacao, String dataProximaDose){
+        this.idVacina = idVacina;
+        this.animal = animal;
+        this.veterinario = veterinario;
+        this.nomeVacina = nomeVacina;
+        this.dose = dose;
+        this.dataAplicacao = dataAplicacao;
+        this.dataProximaDose = dataProximaDose;
+    }
+
+    public int getIdVacina(){
+        return idVacina;
+    }
+
+    public Animal getAnimal(){
+        return animal;
+    }
+
+    public Veterinario getVeterinario(){
+        return veterinario;
+    }
+
+    public String getNomeVacina(){
+        return nomeVacina;
+    }
+
+    public String getDose(){
+        return dose;
+    }
+
+    public String getDataAplicacao(){
+        return dataAplicacao;
+    }
+
+    public String getDataProximaDose(){
+        return dataProximaDose;
+    }
+
+    public void setDataProximaDose(String dataProximaDose){
+        this.dataProximaDose = dataProximaDose;
+    }
+
+    @Override
+    public String toString(){
+        return "Vacina {" +
+                "id = " + idVacina +
+                ", vacina = " + nomeVacina +
+                ", dose = " + dose +
+                ", aplicacao = " + dataAplicacao +
+                ", proximaDose = " + dataProximaDose +
+                ", veterinario = Dr(a). " + veterinario.getNome() +
+                '}';
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\eventos\Atividade.java ===
+package ong.eventos;
+
+import ong.usuario.Voluntario;
+import java.util.ArrayList;
+import java.util.List;
+
+public abstract class Atividade {
+    private int id;
+    private String titulo;
+    private String descricao;
+    private String data;
+    private String local;
+    private int vagasDisponiveis;
+    private List<Voluntario> voluntariosInscritos;
+
+    public Atividade(int id, String titulo, String descricao, String data, String local, int vagasDisponiveis) {
+        this.id = id;
+        this.titulo = titulo;
+        this.descricao = descricao;
+        this.data = data;
+        this.local = local;
+        this.vagasDisponiveis = vagasDisponiveis;
+        this.voluntariosInscritos = new ArrayList<>();
+    }
+
+    public boolean inscreverVoluntario(Voluntario voluntario) {
+        if (vagasDisponiveis > 0 && !voluntariosInscritos.contains(voluntario)) {
+            voluntariosInscritos.add(voluntario);
+            vagasDisponiveis--;
+            voluntario.addAtividadeAtiva(this);
+            return true;
+        }
+        return false;
+    }
+
+    public int getId() {
+        return this.id;
+    }
+
+    public String getTitulo() {
+        return this.titulo;
+    }
+
+    public String getDescricao() {
+        return this.descricao;
+    }
+
+    public String getData() {
+        return this.data;
+    }
+
+    public String getLocal() {
+        return this.local;
+    }
+
+    public int getVagasDisponiveis() {
+        return this.vagasDisponiveis;
+    }
+
+    public List<Voluntario> getVoluntariosInscritos() {
+        return this.voluntariosInscritos;
+    }
+
+    public String getTipo() {
+        return this.getClass().getSimpleName();
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\eventos\CampanhaVacinacao.java ===
+package ong.eventos;
+
+
+
+
+public class CampanhaVacinacao extends Atividade{
+    public CampanhaVacinacao(int id, String titulo, String descricao, String data, String local, int vagasDisponiveis){
+        super(id, titulo, descricao, data, local, vagasDisponiveis);
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\eventos\EventoBeneficente.java ===
+package ong.eventos;
+
+
+
+
+public class EventoBeneficente extends Atividade{
+    public EventoBeneficente(int id, String titulo, String descricao, String data, String local, int vagasDisponiveis){
+        super(id, titulo, descricao, data, local, vagasDisponiveis);
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\eventos\FeiraAdocao.java ===
+package ong.eventos;
+
+import ong.animais.Animal;
+
+import java.util.ArrayList;
+import java.util.List;
+
+
+public class FeiraAdocao extends Atividade{
+    private List<Animal> animaisDisponiveis = new ArrayList<>();
+
+    public FeiraAdocao(int id, String titulo, String descricao, String data, String local, int vagasDisponiveis){
+        super(id, titulo, descricao, data, local, vagasDisponiveis);
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\eventos\MultiraoLimpeza.java ===
+package ong.eventos;
+
+
+
+public class MultiraoLimpeza extends Atividade{
+    public MultiraoLimpeza(int id, String titulo, String descricao, String data, String local, int vagasDisponiveis){
+        super(id, titulo, descricao, data, local, vagasDisponiveis);
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\menu\MenuAdmin.java ===
+package ong.menu;
+
+import ong.UI.*;
+import ong.animais.*;
+import ong.eventos.*;
+import ong.service.Inventario;
+import ong.sistema.SistemaUsuario;
+import ong.usuario.*;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+
+public class MenuAdmin {
+    private Administrador user;
+    private SistemaUsuario sisUser;
+    private Inventario inv;
+
+    public MenuAdmin(Administrador user, SistemaUsuario sisUser, Inventario inv) {
+        this.user = user;
+        this.sisUser = sisUser;
+        this.inv = inv;
+    }
+
+    public void mostrarTela() {
+        CustomFrame janela = new CustomFrame("Área do Administrador - Abrigo Amigos Fofos", 720, 720);
+
+        CustomFormPanel painelFormulario = new CustomFormPanel(560, 620);
+
+        CustomLabel lblTitulo = new CustomLabel("Bem-vindo(a) Administrador(a) " + user.getNome() + "!", Font.BOLD, 22);
+        lblTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        CustomBotao btnGerenciarAnimais = new CustomBotao("Gerenciar Animais", e -> {
+            abrirJanelaGerenciarAnimais();
+        });
+
+        CustomBotao btnGerenciarUsuarios = new CustomBotao("Gerenciar Usuários", e -> {
+            abrirJanelaGerenciarUsuarios();
+        });
+
+        CustomBotao btnAprovarAdocoes = new CustomBotao("Gerenciar Adoções e Devoluções", e -> {
+            abrirJanelaGerenciarAdocoes();
+        });
+
+        CustomBotao btnGerenciarEventos = new CustomBotao("Gerenciar Eventos", e -> {
+            abrirJanelaGerenciarEventos();
+        });
+
+        CustomBotao btnRelatorios = new CustomBotao("Relatórios e Estatísticas", e -> {
+            new MenuRelatorios(sisUser, inv).mostrarTela();
+        });
+
+        CustomBotao btnNotificacoes = new CustomBotao("Notificações e Avisos", e -> {
+            new MenuNotificacoes(user, inv).mostrarTela();
+        });
+
+        btnGerenciarAnimais.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnGerenciarUsuarios.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnAprovarAdocoes.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnGerenciarEventos.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnRelatorios.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnNotificacoes.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        painelFormulario.addComEspacamento(lblTitulo, 36);
+        painelFormulario.addComEspacamento(btnGerenciarAnimais, 18);
+        painelFormulario.addComEspacamento(btnGerenciarUsuarios, 18);
+        painelFormulario.addComEspacamento(btnAprovarAdocoes, 18);
+        painelFormulario.addComEspacamento(btnGerenciarEventos, 18);
+        painelFormulario.addComEspacamento(btnRelatorios, 18);
+        painelFormulario.addComEspacamento(btnNotificacoes, 0);
+
+        janela.setConteudo(painelFormulario);
+        janela.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        janela.setVisible(true);
+    }
+
+    private void abrirJanelaGerenciarAnimais() {
+        CustomFrame tela = new CustomFrame("Gestão de Animais - Abrigo Amigos Fofos", 820, 580);
+
+        JPanel painelPrincipal = new JPanel(new BorderLayout(16, 16));
+        painelPrincipal.setPreferredSize(new Dimension(780, 520));
+        painelPrincipal.setBorder(BorderFactory.createEmptyBorder(16, 24, 16, 24));
+        painelPrincipal.setOpaque(false);
+
+        CustomLabel lblTitulo = new CustomLabel("GESTÃO DE ANIMAIS", Font.BOLD, 22);
+
+        String[] colunas = {"ID", "Nome", "Espécie", "Raça", "Idade", "Porte", "Saúde", "Status"};
+        DefaultTableModel modelo = new DefaultTableModel(colunas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        Runnable atualizar = () -> {
+            modelo.setRowCount(0);
+            for (Animal a : inv.getAnimais()) {
+                modelo.addRow(new Object[]{
+                    String.format("%02d", a.getId()),
+                    a.getNome(),
+                    a.getEspecie(),
+                    a.getRaca(),
+                    a.getIdade(),
+                    a.getPorte(),
+                    a.getEstadoSaude(),
+                    a.getStatusAdocao()
+                });
+            }
+        };
+        atualizar.run();
+
+        JTable tabela = new JTable(modelo);
+        tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tabela.setRowHeight(26);
+        tabela.getTableHeader().setFont(new Font("Quicksand", Font.BOLD, 12));
+        tabela.setFont(new Font("Quicksand", Font.PLAIN, 12));
+
+        JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 4));
+        painelBotoes.setOpaque(false);
+
+        CustomBotao btnCadastrar = new CustomBotao("Cadastrar Animal", e -> {
+            abrirFormularioAnimal(tela, null, atualizar);
+        });
+        btnCadastrar.setFont(new Font("Quicksand", Font.BOLD, 15));
+
+        CustomBotao btnEditar = new CustomBotao("Editar Selecionado", e -> {
+            int linha = tabela.getSelectedRow();
+            if (linha == -1) {
+                JOptionPane.showMessageDialog(tela, "Selecione um animal na tabela.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            int id = Integer.parseInt(modelo.getValueAt(linha, 0).toString());
+            Animal alvo = inv.buscarPorId(id);
+            if (alvo != null) {
+                abrirFormularioAnimal(tela, alvo, atualizar);
+            }
+        });
+        btnEditar.setFont(new Font("Quicksand", Font.BOLD, 15));
+
+        CustomBotao btnRemover = new CustomBotao("Remover Selecionado", e -> {
+            int linha = tabela.getSelectedRow();
+            if (linha == -1) {
+                JOptionPane.showMessageDialog(tela, "Selecione um animal na tabela.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            int id = Integer.parseInt(modelo.getValueAt(linha, 0).toString());
+            boolean removido = inv.removerAnimal(id);
+            if (removido) {
+                JOptionPane.showMessageDialog(tela, "Animal removido do sistema.");
+                atualizar.run();
+            } else {
+                JOptionPane.showMessageDialog(tela, "Não é possível remover um animal já adotado.", "Operação Bloqueada", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        btnRemover.setFont(new Font("Quicksand", Font.BOLD, 15));
+
+        CustomBotao btnFechar = new CustomBotao("Fechar", e -> tela.dispose());
+        btnFechar.setFont(new Font("Quicksand", Font.BOLD, 15));
+
+        painelBotoes.add(btnCadastrar);
+        painelBotoes.add(btnEditar);
+        painelBotoes.add(btnRemover);
+        painelBotoes.add(btnFechar);
+
+        painelPrincipal.add(lblTitulo, BorderLayout.NORTH);
+        painelPrincipal.add(new JScrollPane(tabela), BorderLayout.CENTER);
+        painelPrincipal.add(painelBotoes, BorderLayout.SOUTH);
+
+        tela.setConteudo(painelPrincipal);
+        tela.setVisible(true);
+    }
+
+    private void abrirFormularioAnimal(Component parent, Animal existente, Runnable aoSalvar) {
+        String[] especies = {"Cachorro", "Gato", "Outros"};
+        JComboBox<String> cbEspecie = new JComboBox<>(especies);
+        CustomTextField txtNome = new CustomTextField();
+        CustomTextField txtRaca = new CustomTextField();
+        CustomTextField txtIdade = new CustomTextField();
+        CustomTextField txtPorte = new CustomTextField();
+        CustomTextField txtSaude = new CustomTextField();
+        CustomTextField txtData = new CustomTextField();
+        CustomTextField txtStatus = new CustomTextField();
+
+        if (existente != null) {
+            cbEspecie.setSelectedItem(existente.getEspecie());
+            cbEspecie.setEnabled(false);
+            txtNome.setText(existente.getNome());
+            txtRaca.setText(existente.getRaca());
+            txtIdade.setText(String.valueOf(existente.getIdade()));
+            txtPorte.setText(existente.getPorte());
+            txtSaude.setText(existente.getEstadoSaude());
+            txtData.setText(existente.getDataResgate());
+            txtStatus.setText(existente.getStatusAdocao());
+        } else {
+            txtStatus.setText("Disponível");
+        }
+
+        Object[] campos = {
+            new CustomLabel("Espécie:"), cbEspecie,
+            new CustomLabel("Nome:"), txtNome,
+            new CustomLabel("Raça:"), txtRaca,
+            new CustomLabel("Idade (anos):"), txtIdade,
+            new CustomLabel("Porte:"), txtPorte,
+            new CustomLabel("Estado de Saúde:"), txtSaude,
+            new CustomLabel("Data de Resgate (dd/mm/aaaa):"), txtData,
+            new CustomLabel("Status de Adoção:"), txtStatus
+        };
+
+        String titulo = existente == null ? "Cadastrar Animal Resgatado" : "Editar Registro de Animal";
+        if (JOptionPane.showConfirmDialog(parent, campos, titulo, JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+            try {
+                String nome = txtNome.getText().trim();
+                String raca = txtRaca.getText().trim();
+                int idade = Integer.parseInt(txtIdade.getText().trim());
+                String porte = txtPorte.getText().trim();
+                String saude = txtSaude.getText().trim();
+                String data = txtData.getText().trim();
+                String status = txtStatus.getText().trim();
+
+                if (nome.isEmpty() || raca.isEmpty() || porte.isEmpty() || saude.isEmpty() || data.isEmpty() || status.isEmpty()) {
+                    JOptionPane.showMessageDialog(parent, "Preencha todos os campos.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                if (existente == null) {
+                    int novoId = 1;
+                    for (Animal a : inv.getAnimais()) {
+                        if (a.getId() >= novoId) {
+                            novoId = a.getId() + 1;
+                        }
+                    }
+                    String esp = (String) cbEspecie.getSelectedItem();
+                    Animal novo;
+                    if ("Cachorro".equals(esp)) {
+                        novo = new Cachorro(novoId, nome, raca, idade, porte, saude, data, status);
+                    } else if ("Gato".equals(esp)) {
+                        novo = new Gato(novoId, nome, raca, idade, porte, saude, data, status);
+                    } else {
+                        novo = new Outros(novoId, nome, raca, idade, porte, saude, data, status);
+                    }
+                    inv.addAnimal(novo);
+                } else {
+                    inv.editarAnimal(existente.getId(), nome, raca, idade, porte, saude, data, status);
+                }
+                aoSalvar.run();
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(parent, "A idade deve ser um número inteiro.", "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void abrirJanelaGerenciarUsuarios() {
+        CustomFrame tela = new CustomFrame("Gestão de Usuários - Abrigo Amigos Fofos", 760, 540);
+
+        JPanel painelPrincipal = new JPanel(new BorderLayout(16, 16));
+        painelPrincipal.setPreferredSize(new Dimension(720, 480));
+        painelPrincipal.setBorder(BorderFactory.createEmptyBorder(16, 24, 16, 24));
+        painelPrincipal.setOpaque(false);
+
+        CustomLabel lblTitulo = new CustomLabel("USUÁRIOS CADASTRADOS NO SISTEMA", Font.BOLD, 22);
+
+        String[] colunas = {"Nome", "E-mail", "CPF", "Perfil"};
+        DefaultTableModel modelo = new DefaultTableModel(colunas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        Runnable atualizar = () -> {
+            modelo.setRowCount(0);
+            for (Usuario u : sisUser.getTodosUsuarios()) {
+                modelo.addRow(new Object[]{
+                    u.getNome(),
+                    u.getEmail(),
+                    u.getCpf(),
+                    u.getClass().getSimpleName()
+                });
+            }
+        };
+        atualizar.run();
+
+        JTable tabela = new JTable(modelo);
+        tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tabela.setRowHeight(26);
+        tabela.getTableHeader().setFont(new Font("Quicksand", Font.BOLD, 13));
+        tabela.setFont(new Font("Quicksand", Font.PLAIN, 13));
+
+        JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 4));
+        painelBotoes.setOpaque(false);
+
+        CustomBotao btnPromover = new CustomBotao("Promover a Admin", e -> {
+            int linha = tabela.getSelectedRow();
+            if (linha == -1) {
+                JOptionPane.showMessageDialog(tela, "Selecione um usuário.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            String email = modelo.getValueAt(linha, 1).toString();
+            if (sisUser.promoverParaAdmin(email)) {
+                JOptionPane.showMessageDialog(tela, "Usuário promovido a Administrador!");
+                atualizar.run();
+            } else {
+                JOptionPane.showMessageDialog(tela, "Este usuário já é Administrador.", "Aviso", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+        btnPromover.setFont(new Font("Quicksand", Font.BOLD, 15));
+
+        CustomBotao btnRemover = new CustomBotao("Remover Usuário", e -> {
+            int linha = tabela.getSelectedRow();
+            if (linha == -1) {
+                JOptionPane.showMessageDialog(tela, "Selecione um usuário.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            String email = modelo.getValueAt(linha, 1).toString();
+            if (email.equalsIgnoreCase(user.getEmail())) {
+                JOptionPane.showMessageDialog(tela, "Você não pode remover sua própria conta logada.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            if (sisUser.removerUsuario(email)) {
+                JOptionPane.showMessageDialog(tela, "Usuário removido.");
+                atualizar.run();
+            }
+        });
+        btnRemover.setFont(new Font("Quicksand", Font.BOLD, 15));
+
+        CustomBotao btnFechar = new CustomBotao("Fechar", e -> tela.dispose());
+        btnFechar.setFont(new Font("Quicksand", Font.BOLD, 15));
+
+        painelBotoes.add(btnPromover);
+        painelBotoes.add(btnRemover);
+        painelBotoes.add(btnFechar);
+
+        painelPrincipal.add(lblTitulo, BorderLayout.NORTH);
+        painelPrincipal.add(new JScrollPane(tabela), BorderLayout.CENTER);
+        painelPrincipal.add(painelBotoes, BorderLayout.SOUTH);
+
+        tela.setConteudo(painelPrincipal);
+        tela.setVisible(true);
+    }
+
+    private void abrirJanelaGerenciarAdocoes() {
+        CustomFrame tela = new CustomFrame("Processo de Adoção - Abrigo Amigos Fofos", 820, 560);
+
+        JPanel painelPrincipal = new JPanel(new BorderLayout(16, 16));
+        painelPrincipal.setPreferredSize(new Dimension(780, 500));
+        painelPrincipal.setBorder(BorderFactory.createEmptyBorder(16, 24, 16, 24));
+        painelPrincipal.setOpaque(false);
+
+        CustomLabel lblTitulo = new CustomLabel("SOLICITAÇÕES E HISTÓRICO DE ADOÇÕES", Font.BOLD, 22);
+
+        String[] colunas = {"ID Sol.", "ID Animal", "Animal", "Candidato", "CPF", "Status"};
+        DefaultTableModel modelo = new DefaultTableModel(colunas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        Runnable atualizar = () -> {
+            modelo.setRowCount(0);
+            for (SolicitacaoAdocao sol : inv.getSolicitacoes()) {
+                modelo.addRow(new Object[]{
+                    String.format("%04d", sol.getIdSolicitacao()),
+                    String.format("%02d", sol.getAnimal().getId()),
+                    sol.getAnimal().getNome(),
+                    sol.getNomeCandidato(),
+                    sol.getCpfCandidato(),
+                    sol.getStatus()
+                });
+            }
+        };
+        atualizar.run();
+
+        JTable tabela = new JTable(modelo);
+        tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tabela.setRowHeight(26);
+        tabela.getTableHeader().setFont(new Font("Quicksand", Font.BOLD, 13));
+        tabela.setFont(new Font("Quicksand", Font.PLAIN, 13));
+
+        JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 4));
+        painelBotoes.setOpaque(false);
+
+        CustomBotao btnAprovar = new CustomBotao("Aprovar Adoção", e -> {
+            int linha = tabela.getSelectedRow();
+            if (linha == -1) {
+                JOptionPane.showMessageDialog(tela, "Selecione uma solicitação.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            int idSol = Integer.parseInt(modelo.getValueAt(linha, 0).toString());
+            if (inv.aprovarAdocao(idSol, true)) {
+                JOptionPane.showMessageDialog(tela, "Adoção aprovada com sucesso!");
+                atualizar.run();
+            } else {
+                JOptionPane.showMessageDialog(tela, "Não foi possível aprovar (já processada ou animal já adotado).", "Aviso", JOptionPane.WARNING_MESSAGE);
+            }
+        });
+        btnAprovar.setFont(new Font("Quicksand", Font.BOLD, 15));
+
+        CustomBotao btnRejeitar = new CustomBotao("Rejeitar Adoção", e -> {
+            int linha = tabela.getSelectedRow();
+            if (linha == -1) {
+                JOptionPane.showMessageDialog(tela, "Selecione uma solicitação.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            int idSol = Integer.parseInt(modelo.getValueAt(linha, 0).toString());
+            if (inv.rejeitarAdocao(idSol, true)) {
+                JOptionPane.showMessageDialog(tela, "Solicitação rejeitada.");
+                atualizar.run();
+            } else {
+                JOptionPane.showMessageDialog(tela, "Solicitação já foi processada.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            }
+        });
+        btnRejeitar.setFont(new Font("Quicksand", Font.BOLD, 15));
+
+        CustomBotao btnDevolucao = new CustomBotao("Registrar Devolução", e -> {
+            CustomTextField txtIdAnimal = new CustomTextField();
+            Object[] msg = {new CustomLabel("ID do Animal devolvido:"), txtIdAnimal};
+            if (JOptionPane.showConfirmDialog(tela, msg, "Registrar Devolução", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                try {
+                    int idAnimal = Integer.parseInt(txtIdAnimal.getText().trim());
+                    if (inv.registrarDevolucao(idAnimal)) {
+                        JOptionPane.showMessageDialog(tela, "Devolução registrada! O animal está disponível novamente.");
+                        atualizar.run();
+                    } else {
+                        JOptionPane.showMessageDialog(tela, "Animal não encontrado ou não está com status Adotado.", "Erro", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(tela, "ID inválido.", "Erro", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        btnDevolucao.setFont(new Font("Quicksand", Font.BOLD, 15));
+
+        CustomBotao btnFechar = new CustomBotao("Fechar", e -> tela.dispose());
+        btnFechar.setFont(new Font("Quicksand", Font.BOLD, 15));
+
+        painelBotoes.add(btnAprovar);
+        painelBotoes.add(btnRejeitar);
+        painelBotoes.add(btnDevolucao);
+        painelBotoes.add(btnFechar);
+
+        painelPrincipal.add(lblTitulo, BorderLayout.NORTH);
+        painelPrincipal.add(new JScrollPane(tabela), BorderLayout.CENTER);
+        painelPrincipal.add(painelBotoes, BorderLayout.SOUTH);
+
+        tela.setConteudo(painelPrincipal);
+        tela.setVisible(true);
+    }
+
+    private void abrirJanelaGerenciarEventos() {
+        CustomFrame tela = new CustomFrame("Gestão de Atividades e Eventos", 800, 560);
+
+        JPanel painelPrincipal = new JPanel(new BorderLayout(16, 16));
+        painelPrincipal.setPreferredSize(new Dimension(760, 500));
+        painelPrincipal.setBorder(BorderFactory.createEmptyBorder(16, 24, 16, 24));
+        painelPrincipal.setOpaque(false);
+
+        CustomLabel lblTitulo = new CustomLabel("ATIVIDADES E EVENTOS DA ONG", Font.BOLD, 22);
+
+        String[] colunas = {"ID", "Título", "Categoria", "Data", "Local", "Vagas", "Inscritos"};
+        DefaultTableModel modelo = new DefaultTableModel(colunas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        Runnable atualizar = () -> {
+            modelo.setRowCount(0);
+            for (Atividade a : inv.getAtividades()) {
+                modelo.addRow(new Object[]{
+                    String.format("%02d", a.getId()),
+                    a.getTitulo(),
+                    a.getTipo(),
+                    a.getData(),
+                    a.getLocal(),
+                    a.getVagasDisponiveis(),
+                    a.getVoluntariosInscritos().size()
+                });
+            }
+        };
+        atualizar.run();
+
+        JTable tabela = new JTable(modelo);
+        tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tabela.setRowHeight(26);
+        tabela.getTableHeader().setFont(new Font("Quicksand", Font.BOLD, 13));
+        tabela.setFont(new Font("Quicksand", Font.PLAIN, 13));
+
+        JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 4));
+        painelBotoes.setOpaque(false);
+
+        CustomBotao btnNovoEvento = new CustomBotao("Criar Atividade", e -> {
+            String[] tipos = {"Mutirão de Limpeza", "Campanha de Vacinação", "Feira de Adoção", "Evento Beneficente"};
+            JComboBox<String> cbTipo = new JComboBox<>(tipos);
+            CustomTextField txtTitulo = new CustomTextField();
+            CustomTextField txtDesc = new CustomTextField();
+            CustomTextField txtData = new CustomTextField();
+            CustomTextField txtLocal = new CustomTextField();
+            CustomTextField txtVagas = new CustomTextField();
+
+            Object[] campos = {
+                new CustomLabel("Tipo de Atividade:"), cbTipo,
+                new CustomLabel("Título:"), txtTitulo,
+                new CustomLabel("Descrição:"), txtDesc,
+                new CustomLabel("Data (dd/mm/aaaa):"), txtData,
+                new CustomLabel("Local:"), txtLocal,
+                new CustomLabel("Vagas Disponíveis:"), txtVagas
+            };
+
+            if (JOptionPane.showConfirmDialog(tela, campos, "Nova Atividade", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                try {
+                    String titulo = txtTitulo.getText().trim();
+                    String desc = txtDesc.getText().trim();
+                    String data = txtData.getText().trim();
+                    String local = txtLocal.getText().trim();
+                    int vagas = Integer.parseInt(txtVagas.getText().trim());
+
+                    if (titulo.isEmpty() || desc.isEmpty() || data.isEmpty() || local.isEmpty()) {
+                        JOptionPane.showMessageDialog(tela, "Preencha todos os campos.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+
+                    int novoId = 1;
+                    for (Atividade a : inv.getAtividades()) {
+                        if (a.getId() >= novoId) {
+                            novoId = a.getId() + 1;
+                        }
+                    }
+
+                    String sel = (String) cbTipo.getSelectedItem();
+                    Atividade nova;
+                    if ("Mutirão de Limpeza".equals(sel)) {
+                        nova = new MultiraoLimpeza(novoId, titulo, desc, data, local, vagas);
+                    } else if ("Campanha de Vacinação".equals(sel)) {
+                        nova = new CampanhaVacinacao(novoId, titulo, desc, data, local, vagas);
+                    } else if ("Feira de Adoção".equals(sel)) {
+                        nova = new FeiraAdocao(novoId, titulo, desc, data, local, vagas);
+                    } else {
+                        nova = new EventoBeneficente(novoId, titulo, desc, data, local, vagas);
+                    }
+                    inv.addAtividade(nova);
+                    atualizar.run();
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(tela, "Vagas deve ser um número inteiro.", "Erro", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        btnNovoEvento.setFont(new Font("Quicksand", Font.BOLD, 15));
+
+        CustomBotao btnRemoverEvento = new CustomBotao("Remover Atividade", e -> {
+            int linha = tabela.getSelectedRow();
+            if (linha == -1) {
+                JOptionPane.showMessageDialog(tela, "Selecione uma atividade.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            int id = Integer.parseInt(modelo.getValueAt(linha, 0).toString());
+            if (inv.removerAtividade(id)) {
+                atualizar.run();
+            }
+        });
+        btnRemoverEvento.setFont(new Font("Quicksand", Font.BOLD, 15));
+
+        CustomBotao btnFechar = new CustomBotao("Fechar", e -> tela.dispose());
+        btnFechar.setFont(new Font("Quicksand", Font.BOLD, 15));
+
+        painelBotoes.add(btnNovoEvento);
+        painelBotoes.add(btnRemoverEvento);
+        painelBotoes.add(btnFechar);
+
+        painelPrincipal.add(lblTitulo, BorderLayout.NORTH);
+        painelPrincipal.add(new JScrollPane(tabela), BorderLayout.CENTER);
+        painelPrincipal.add(painelBotoes, BorderLayout.SOUTH);
+
+        tela.setConteudo(painelPrincipal);
+        tela.setVisible(true);
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\menu\MenuAnimaisDisponiveis.java ===
+package ong.menu;
+
+import ong.UI.*;
+import ong.animais.*;
+import ong.service.Inventario;
+import ong.usuario.Voluntario;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class MenuAnimaisDisponiveis {
+    private Inventario inv;
+    private Voluntario voluntarioLogado;
+    private JTable tabAnimais;
+    private DefaultTableModel modeloTabela;
+    private CustomTextField txtPesquisar;
+    private String filtroEspecieAtual = "Todos";
+
+    public MenuAnimaisDisponiveis(Inventario inv) {
+        this(inv, null);
+    }
+
+    public MenuAnimaisDisponiveis(Inventario inv, Voluntario voluntarioLogado) {
+        this.inv = inv;
+        this.voluntarioLogado = voluntarioLogado;
+    }
+
+    public void mostrarTela() {
+        CustomFrame janela = new CustomFrame("Animais Disponíveis - Abrigo Amigos Fofos", 760, 700);
+
+        JPanel painelPrincipal = new JPanel(new BorderLayout(16, 16));
+        painelPrincipal.setPreferredSize(new Dimension(720, 640));
+        painelPrincipal.setBorder(BorderFactory.createEmptyBorder(16, 24, 16, 24));
+        painelPrincipal.setOpaque(false);
+
+        JPanel painelTopo = new JPanel();
+        painelTopo.setLayout(new BoxLayout(painelTopo, BoxLayout.Y_AXIS));
+        painelTopo.setOpaque(false);
+
+        CustomLabel lblTitulo = new CustomLabel("ANIMAIS DISPONÍVEIS", Font.BOLD, 24);
+
+        JPanel painelPesquisa = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 4));
+        painelPesquisa.setOpaque(false);
+        painelPesquisa.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        CustomLabel lblPesquisar = new CustomLabel("Pesquisar:  ");
+        txtPesquisar = new CustomTextField();
+        txtPesquisar.setPreferredSize(new Dimension(320, 36));
+
+        txtPesquisar.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) { atualizarTabela(); }
+            public void removeUpdate(DocumentEvent e) { atualizarTabela(); }
+            public void changedUpdate(DocumentEvent e) { atualizarTabela(); }
+        });
+
+        painelPesquisa.add(lblPesquisar);
+        painelPesquisa.add(txtPesquisar);
+
+        JPanel painelFiltros = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 5));
+        painelFiltros.setOpaque(false);
+        painelFiltros.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        CustomLabel lblFiltro = new CustomLabel("Filtro por Espécie: ");
+
+        CustomBotao btnTodos = new CustomBotao("Todos", e -> {
+            filtroEspecieAtual = "Todos"; atualizarTabela();
+        });
+        CustomBotao btnCao = new CustomBotao("Cão", e -> {
+            filtroEspecieAtual = "Cachorro"; atualizarTabela();
+        });
+        CustomBotao btnGato = new CustomBotao("Gato", e -> {
+            filtroEspecieAtual = "Gato"; atualizarTabela();
+        });
+        CustomBotao btnOutros = new CustomBotao("Outros", e -> {
+            filtroEspecieAtual = "Outros"; atualizarTabela();
+        });
+
+        Font fonteFiltro = new Font("Quicksand", Font.BOLD, 14);
+        btnTodos.setFont(fonteFiltro);
+        btnCao.setFont(fonteFiltro);
+        btnGato.setFont(fonteFiltro);
+        btnOutros.setFont(fonteFiltro);
+
+        painelFiltros.add(lblFiltro);
+        painelFiltros.add(btnTodos);
+        painelFiltros.add(btnCao);
+        painelFiltros.add(btnGato);
+        painelFiltros.add(btnOutros);
+
+        painelTopo.add(lblTitulo);
+        painelTopo.add(Box.createVerticalStrut(15));
+        painelTopo.add(painelPesquisa);
+        painelTopo.add(Box.createVerticalStrut(5));
+        painelTopo.add(painelFiltros);
+
+        String[] colunas = {"ID", "Nome", "Espécie", "Idade", "Status"};
+        modeloTabela = new DefaultTableModel(colunas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        tabAnimais = new JTable(modeloTabela);
+        tabAnimais.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tabAnimais.setRowHeight(24);
+        tabAnimais.getTableHeader().setFont(new Font("Quicksand", Font.BOLD, 12));
+        tabAnimais.setFont(new Font("Quicksand", Font.PLAIN, 12));
+
+        JScrollPane scrollTabela = new JScrollPane(tabAnimais);
+
+        JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 16, 4));
+        painelBotoes.setOpaque(false);
+
+        CustomBotao btnVerDetalhes = new CustomBotao("Ver Detalhes", e -> {
+            Animal selecionado = getAnimalSelecionado(janela);
+            if (selecionado != null) {
+                String detalhes = String.format(
+                    "ID: %02d\nNome: %s\nEspécie: %s\nRaça: %s\nIdade: %d ano(s)\nPorte: %s\nSaúde: %s\nData de Resgate: %s\nStatus: %s",
+                    selecionado.getId(), selecionado.getNome(), selecionado.getEspecie(),
+                    selecionado.getRaca(), selecionado.getIdade(), selecionado.getPorte(),
+                    selecionado.getEstadoSaude(), selecionado.getDataResgate(), selecionado.getStatusAdocao()
+                );
+                JOptionPane.showMessageDialog(janela, detalhes, "Detalhes de " + selecionado.getNome(), JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+
+        CustomBotao btnSolicitarAdocao = new CustomBotao("Solicitar Adoção", e -> {
+            Animal selecionado = getAnimalSelecionado(janela);
+            if (selecionado != null) {
+                abrirDialogoAdocao(janela, selecionado);
+            }
+        });
+
+        painelBotoes.add(btnVerDetalhes);
+        painelBotoes.add(btnSolicitarAdocao);
+
+        painelPrincipal.add(painelTopo, BorderLayout.NORTH);
+        painelPrincipal.add(scrollTabela, BorderLayout.CENTER);
+        painelPrincipal.add(painelBotoes, BorderLayout.SOUTH);
+
+        atualizarTabela();
+
+        janela.setConteudo(painelPrincipal);
+        janela.setVisible(true);
+    }
+
+    private void atualizarTabela() {
+        modeloTabela.setRowCount(0);
+        String termo = txtPesquisar.getText().trim().toLowerCase();
+
+        List<Animal> listaFiltrada;
+        if (filtroEspecieAtual.equals("Cachorro") || filtroEspecieAtual.equals("Gato")) {
+            listaFiltrada = inv.filtrarPorEspecie(filtroEspecieAtual);
+        } else if (filtroEspecieAtual.equals("Outros")) {
+            listaFiltrada = new ArrayList<>();
+            for (Animal a : inv.getAnimais()) {
+                if (!(a instanceof Cachorro) && !(a instanceof Gato)) {
+                    listaFiltrada.add(a);
+                }
+            }
+        } else {
+            listaFiltrada = inv.getAnimais();
+        }
+
+        for (Animal a : listaFiltrada) {
+            String status = a.getStatusAdocao().toLowerCase();
+            if (!status.contains("disponivel") && !status.contains("disponível")) {
+                continue;
+            }
+            if (termo.isEmpty() || a.getNome().toLowerCase().contains(termo)) {
+                String idFormatado = String.format("%02d", a.getId());
+                String idadeFormatada = a.getIdade() + (a.getIdade() == 1 ? " ano" : " anos");
+
+                modeloTabela.addRow(new Object[]{
+                    idFormatado,
+                    a.getNome(),
+                    a.getEspecie(),
+                    idadeFormatada,
+                    a.getStatusAdocao()
+                });
+            }
+        }
+    }
+
+    private Animal getAnimalSelecionado(Component parent) {
+        int linha = tabAnimais.getSelectedRow();
+        if (linha == -1) {
+            JOptionPane.showMessageDialog(parent, "Selecione um animal na tabela primeiro.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return null;
+        }
+        int idAnimal = Integer.parseInt(modeloTabela.getValueAt(linha, 0).toString());
+        return inv.buscarPorId(idAnimal);
+    }
+
+    private void abrirDialogoAdocao(Component parent, Animal animal) {
+        CustomTextField txtNomeCandidato = new CustomTextField();
+        CustomTextField txtCpfCandidato = new CustomTextField();
+
+        if (voluntarioLogado != null) {
+            txtNomeCandidato.setText(voluntarioLogado.getNome());
+            txtNomeCandidato.setEditable(false);
+        }
+
+        Object[] campos = {
+            new CustomLabel("Animal selecionado: " + animal.getNome() + " (ID: " + String.format("%02d", animal.getId()) + ")", Font.BOLD, 16),
+            new CustomLabel("Nome do Candidato:"), txtNomeCandidato,
+            new CustomLabel("CPF do Candidato:"), txtCpfCandidato
+        };
+
+        int opcao = JOptionPane.showConfirmDialog(parent, campos, "Solicitar Adoção", JOptionPane.OK_CANCEL_OPTION);
+        if (opcao == JOptionPane.OK_OPTION) {
+            String nome = txtNomeCandidato.getText().trim();
+            String cpf = txtCpfCandidato.getText().trim();
+
+            if (nome.isEmpty() || cpf.isEmpty()) {
+                JOptionPane.showMessageDialog(parent, "Preencha nome e CPF.", "Erro", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (voluntarioLogado != null) {
+                String cpfDigitadoLimpo = cpf.replaceAll("[^0-9]", "");
+                String cpfVoluntarioLimpo = voluntarioLogado.getCpf().replaceAll("[^0-9]", "");
+                if (!cpfDigitadoLimpo.equals(cpfVoluntarioLimpo)) {
+                    JOptionPane.showMessageDialog(parent, "O CPF informado não corresponde ao do voluntário logado.", "CPF Inválido", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                cpf = voluntarioLogado.getCpf();
+            }
+
+            try {
+                int idSolicitacao = (int) (System.currentTimeMillis() % 10000);
+                boolean sucesso = inv.solicitarAdocao(idSolicitacao, animal.getId(), nome, cpf);
+
+                if (sucesso) {
+                    JOptionPane.showMessageDialog(
+                        parent,
+                        "Solicitação #" + String.format("%04d", idSolicitacao) + " registrada com sucesso para " + animal.getNome() + "!",
+                        "Sucesso",
+                        JOptionPane.INFORMATION_MESSAGE
+                    );
+                    atualizarTabela();
+                }
+            } catch (IllegalArgumentException | IllegalStateException ex) {
+                JOptionPane.showMessageDialog(parent, ex.getMessage(), "Não foi possível solicitar", JOptionPane.WARNING_MESSAGE);
+            }
+        }
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\menu\MenuEntrar.java ===
+package ong.menu;
+
+import ong.UI.*;
+import ong.sistema.SistemaUsuario;
+import ong.usuario.*;
+import ong.service.Inventario;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class MenuEntrar {
+    private SistemaUsuario sisUser;
+    private Inventario inv;
+
+    public MenuEntrar(SistemaUsuario sisUser, Inventario inv) {
+        this.sisUser = sisUser;
+        this.inv = inv;
+    }
+
+    public void mostrarTela() {
+        CustomFrame janela = new CustomFrame("Login - Abrigo Amigos Fofos", 720, 480);
+
+        CustomFormPanel painelFormulario = new CustomFormPanel(720, 480);
+
+        CustomLabel lblTitulo = new CustomLabel("Insira seus dados:", Font.BOLD, 24);
+
+        CustomLabel lblEmail = new CustomLabel("e-mail");
+        CustomTextField txtEmail = new CustomTextField();
+
+        CustomLabel lblSenha = new CustomLabel("senha");
+        CustomPasswordField txtSenha = new CustomPasswordField();
+
+        CustomBotao btnEntrar = new CustomBotao("Entrar", e -> {
+            String email = txtEmail.getText().trim();
+            String senha = new String(txtSenha.getPassword());
+
+            Usuario userLogado = sisUser.validarLogin(email, senha);
+
+            if (userLogado != null) {
+                if (userLogado instanceof Voluntario) {
+                    new MenuVoluntario((Voluntario) userLogado, this.inv).mostrarTela();
+                } else if (userLogado instanceof Veterinario) {
+                    new MenuVeterinario((Veterinario) userLogado, this.inv).mostrarTela();
+                } else {
+                    new MenuAdmin((Administrador) userLogado, this.sisUser, this.inv).mostrarTela();
+                }
+                janela.dispose();
+            } else {
+                JOptionPane.showMessageDialog(janela, "E-mail ou senha inválidos.", "Erro de Login", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        CustomLabel lblEsqueceuSenha = new CustomLabel("<html><u style='color:blue;'>Esqueceu a senha?</u></html>", true);
+        lblEsqueceuSenha.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                JOptionPane.showMessageDialog(janela, "Contate um administrador do abrigo para redefinir sua senha.");
+            }
+        });
+
+        painelFormulario.addComEspacamento(lblTitulo, 30);
+        painelFormulario.addComEspacamento(lblEmail, 5);
+        painelFormulario.addComEspacamento(txtEmail, 15);
+        painelFormulario.addComEspacamento(lblSenha, 5);
+        painelFormulario.addComEspacamento(txtSenha, 25);
+        painelFormulario.addComEspacamento(btnEntrar, 15);
+        painelFormulario.addComEspacamento(lblEsqueceuSenha, 0);
+
+        janela.setConteudo(painelFormulario);
+        janela.setVisible(true);
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\menu\MenuEventos.java ===
+package ong.menu;
+
+import ong.UI.*;
+import ong.eventos.Atividade;
+import ong.service.Inventario;
+import ong.usuario.*;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+
+public class MenuEventos {
+    private Usuario user;
+    private Inventario inv;
+
+    public MenuEventos(Usuario user, Inventario inv) {
+        this.user = user;
+        this.inv = inv;
+    }
+
+    public void mostrarTela() {
+        CustomFrame janela = new CustomFrame("Eventos e Atividades - Abrigo Amigos Fofos", 780, 560);
+
+        JPanel painelPrincipal = new JPanel(new BorderLayout(16, 16));
+        painelPrincipal.setPreferredSize(new Dimension(740, 500));
+        painelPrincipal.setBorder(BorderFactory.createEmptyBorder(16, 24, 16, 24));
+        painelPrincipal.setOpaque(false);
+
+        CustomLabel lblTitulo = new CustomLabel("EVENTOS E ATIVIDADES DISPONÍVEIS", Font.BOLD, 22);
+
+        String[] colunas = {"ID", "Título", "Categoria", "Data", "Local", "Vagas"};
+        DefaultTableModel modelo = new DefaultTableModel(colunas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        Runnable atualizar = () -> {
+            modelo.setRowCount(0);
+            for (Atividade a : inv.getAtividades()) {
+                modelo.addRow(new Object[]{
+                    String.format("%02d", a.getId()),
+                    a.getTitulo(),
+                    a.getTipo(),
+                    a.getData(),
+                    a.getLocal(),
+                    a.getVagasDisponiveis()
+                });
+            }
+        };
+        atualizar.run();
+
+        JTable tabela = new JTable(modelo);
+        tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tabela.setRowHeight(26);
+        tabela.getTableHeader().setFont(new Font("Quicksand", Font.BOLD, 13));
+        tabela.setFont(new Font("Quicksand", Font.PLAIN, 13));
+
+        JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 14, 4));
+        painelBotoes.setOpaque(false);
+
+        CustomBotao btnDetalhes = new CustomBotao("Ver Descrição", e -> {
+            int linha = tabela.getSelectedRow();
+            if (linha == -1) {
+                JOptionPane.showMessageDialog(janela, "Selecione um evento primeiro.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            int id = Integer.parseInt(modelo.getValueAt(linha, 0).toString());
+            Atividade a = inv.buscarAtividadePorId(id);
+            if (a != null) {
+                String info = "Título: " + a.getTitulo() +
+                              "\nTipo: " + a.getTipo() +
+                              "\nData: " + a.getData() +
+                              "\nLocal: " + a.getLocal() +
+                              "\nVagas Restantes: " + a.getVagasDisponiveis() +
+                              "\nDescrição: " + a.getDescricao();
+                JOptionPane.showMessageDialog(janela, info, "Detalhes da Atividade", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+        btnDetalhes.setFont(new Font("Quicksand", Font.BOLD, 16));
+
+        CustomBotao btnParticipar = new CustomBotao("Inscrever-se", e -> {
+            int linha = tabela.getSelectedRow();
+            if (linha == -1) {
+                JOptionPane.showMessageDialog(janela, "Selecione um evento na tabela.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            if (!(user instanceof Voluntario)) {
+                JOptionPane.showMessageDialog(janela, "Apenas voluntários podem se inscrever nas atividades.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            int id = Integer.parseInt(modelo.getValueAt(linha, 0).toString());
+            Atividade a = inv.buscarAtividadePorId(id);
+            if (a != null) {
+                boolean inscrito = a.inscreverVoluntario((Voluntario) user);
+                if (inscrito) {
+                    JOptionPane.showMessageDialog(janela, "Inscrição confirmada em: " + a.getTitulo() + "!");
+                    atualizar.run();
+                } else {
+                    JOptionPane.showMessageDialog(janela, "Não foi possível se inscrever (sem vagas ou você já está inscrito).", "Aviso", JOptionPane.WARNING_MESSAGE);
+                }
+            }
+        });
+        btnParticipar.setFont(new Font("Quicksand", Font.BOLD, 16));
+
+        CustomBotao btnFechar = new CustomBotao("Fechar", e -> janela.dispose());
+        btnFechar.setFont(new Font("Quicksand", Font.BOLD, 16));
+
+        painelBotoes.add(btnDetalhes);
+        painelBotoes.add(btnParticipar);
+        painelBotoes.add(btnFechar);
+
+        painelPrincipal.add(lblTitulo, BorderLayout.NORTH);
+        painelPrincipal.add(new JScrollPane(tabela), BorderLayout.CENTER);
+        painelPrincipal.add(painelBotoes, BorderLayout.SOUTH);
+
+        janela.setConteudo(painelPrincipal);
+        janela.setVisible(true);
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\menu\MenuNotificacoes.java ===
+package ong.menu;
+
+import ong.UI.*;
+import ong.service.Inventario;
+import ong.service.Notificacao;
+import ong.usuario.*;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+
+public class MenuNotificacoes {
+    private Usuario user;
+    private Inventario inv;
+
+    public MenuNotificacoes(Usuario user, Inventario inv) {
+        this.user = user;
+        this.inv = inv;
+    }
+
+    public void mostrarTela() {
+        CustomFrame tela = new CustomFrame("Central de Notificações - Abrigo Amigos Fofos", 820, 560);
+
+        JPanel painelPrincipal = new JPanel(new BorderLayout(16, 16));
+        painelPrincipal.setPreferredSize(new Dimension(780, 500));
+        painelPrincipal.setBorder(BorderFactory.createEmptyBorder(16, 24, 16, 24));
+        painelPrincipal.setOpaque(false);
+
+        CustomLabel lblTitulo = new CustomLabel("CENTRAL DE NOTIFICAÇÕES E AVISOS", Font.BOLD, 22);
+
+        String[] colunas = {"ID", "Categoria", "Data", "Mensagem"};
+        DefaultTableModel modelo = new DefaultTableModel(colunas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        Runnable atualizar = () -> {
+            modelo.setRowCount(0);
+            ArrayList<Notificacao> lista = inv.getNotificacoesParaUsuario(user);
+            for (Notificacao n : lista) {
+                modelo.addRow(new Object[]{
+                    String.format("%03d", n.getId()),
+                    n.getCategoria(),
+                    n.getData(),
+                    n.getMensagem()
+                });
+            }
+        };
+        atualizar.run();
+
+        JTable tabela = new JTable(modelo);
+        tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tabela.setRowHeight(28);
+        tabela.getTableHeader().setFont(new Font("Quicksand", Font.BOLD, 13));
+        tabela.setFont(new Font("Quicksand", Font.PLAIN, 13));
+        tabela.getColumnModel().getColumn(0).setPreferredWidth(50);
+        tabela.getColumnModel().getColumn(1).setPreferredWidth(180);
+        tabela.getColumnModel().getColumn(2).setPreferredWidth(95);
+        tabela.getColumnModel().getColumn(3).setPreferredWidth(420);
+
+        JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 4));
+        painelBotoes.setOpaque(false);
+
+        CustomBotao btnLerCompleta = new CustomBotao("Ler Aviso Completo", e -> {
+            int linha = tabela.getSelectedRow();
+            if (linha == -1) {
+                JOptionPane.showMessageDialog(tela, "Selecione uma notificação na tabela.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            String cat = modelo.getValueAt(linha, 1).toString();
+            String data = modelo.getValueAt(linha, 2).toString();
+            String msg = modelo.getValueAt(linha, 3).toString();
+            JOptionPane.showMessageDialog(tela, "Categoria: " + cat + "\nData: " + data + "\n\n" + msg, "Detalhe da Notificação", JOptionPane.INFORMATION_MESSAGE);
+        });
+        btnLerCompleta.setFont(new Font("Quicksand", Font.BOLD, 15));
+
+        painelBotoes.add(btnLerCompleta);
+
+        if (user instanceof Administrador) {
+            CustomBotao btnPublicarAviso = new CustomBotao("Publicar Aviso Geral", e -> {
+                CustomTextField txtAviso = new CustomTextField();
+                Object[] campos = {
+                    new CustomLabel("Digite o aviso geral para todos os usuários do abrigo:"),
+                    txtAviso
+                };
+                if (JOptionPane.showConfirmDialog(tela, campos, "Novo Aviso Geral", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                    String texto = txtAviso.getText().trim();
+                    if (!texto.isEmpty()) {
+                        String hoje = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                        inv.registrarNotificacao("Aviso Geral do Abrigo", texto, hoje, null);
+                        atualizar.run();
+                    }
+                }
+            });
+            btnPublicarAviso.setFont(new Font("Quicksand", Font.BOLD, 15));
+            painelBotoes.add(btnPublicarAviso);
+        }
+
+        CustomBotao btnFechar = new CustomBotao("Fechar", e -> tela.dispose());
+        btnFechar.setFont(new Font("Quicksand", Font.BOLD, 15));
+        painelBotoes.add(btnFechar);
+
+        painelPrincipal.add(lblTitulo, BorderLayout.NORTH);
+        painelPrincipal.add(new JScrollPane(tabela), BorderLayout.CENTER);
+        painelPrincipal.add(painelBotoes, BorderLayout.SOUTH);
+
+        tela.setConteudo(painelPrincipal);
+        tela.setVisible(true);
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\menu\MenuPrincipal.java ===
+package ong.menu;
+
+import ong.sistema.SistemaUsuario;
+import ong.service.*;
+import ong.UI.*;
+
+import javax.swing.*;
+
+import java.awt.*;
+
+
+public class MenuPrincipal {
+    private SistemaUsuario sisUser;
+    private Inventario inv;
+
+    public MenuPrincipal(SistemaUsuario sisUser, Inventario inv){
+        this.sisUser = sisUser;
+        this.inv = inv;
+    }
+
+    public void mostrarMenu(){
+        CustomFrame janela = new CustomFrame("Login - Abrigo Amigos Fofos", 720, 480);
+
+        CustomFormPanel painelConteudo = new CustomFormPanel(700, 480);
+
+        CustomLabel lblLinha1 = new CustomLabel("Bem vindo ao sistema do", Font.BOLD, 34);
+        CustomLabel lblLinha2 = new CustomLabel("Abrigo Amigos Fofos", Font.BOLD, 34);
+
+        lblLinha1.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblLinha2.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        CustomBotao btnEntrar = new CustomBotao("Entrar", e -> {
+            new MenuEntrar(this.sisUser, this.inv).mostrarTela();
+        });
+
+        CustomBotao btnRegistrar = new CustomBotao("Registrar", e -> {
+            new MenuRegistrar(this.sisUser).mostrarTela();
+        });
+
+        CustomBotao btnVisuAnimais = new CustomBotao("Visualizar Animais Disponíveis", e -> {
+            new MenuAnimaisDisponiveis(this.inv).mostrarTela();
+
+        });
+
+        CustomBotao btnSobreSis = new CustomBotao("Sobre o Sistema", e -> {
+            JOptionPane.showMessageDialog(janela, "Sistema de Gerenciamento para ONG - Abrigo Amigos Fofos v1.0, feito por Amanda e Victor!");
+        });
+       
+        btnEntrar.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnRegistrar.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnVisuAnimais.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnSobreSis.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        painelConteudo.addComEspacamento(lblLinha1, 5);
+        painelConteudo.addComEspacamento(lblLinha2, 60);
+        painelConteudo.addComEspacamento(btnEntrar, 8);
+        painelConteudo.addComEspacamento(btnRegistrar, 8);
+        painelConteudo.addComEspacamento(btnVisuAnimais, 8);
+        painelConteudo.addComEspacamento(btnSobreSis, 8);
+
+        janela.setConteudo(painelConteudo);
+        janela.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        janela.setVisible(true);
+    }
+
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\menu\MenuRegistrar.java ===
+package ong.menu;
+
+import ong.UI.*;
+import ong.sistema.SistemaUsuario;
+import ong.usuario.*;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class MenuRegistrar {
+    private SistemaUsuario sisUser;
+    private String tipoSelecionado = "Voluntario";
+
+    public MenuRegistrar(SistemaUsuario sisUser) {
+        this.sisUser = sisUser;
+    }
+
+    public void mostrarTela() {
+        CustomFrame janela = new CustomFrame("Cadastro - Abrigo Amigos Fofos", 540, 700);
+
+        JPanel painelPrincipal = new JPanel();
+        painelPrincipal.setLayout(new BoxLayout(painelPrincipal, BoxLayout.Y_AXIS));
+        painelPrincipal.setBorder(BorderFactory.createEmptyBorder(25, 40, 25, 40));
+        painelPrincipal.setOpaque(false);
+        painelPrincipal.setPreferredSize(new Dimension(460, 520));
+
+        
+        CustomLabel lblTitulo = new CustomLabel("Registrar como:", Font.BOLD, 22);
+        lblTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        CustomLabel lblPerfilAtivo = new CustomLabel("Perfil selecionado: Voluntário", Font.ITALIC, 13);
+        lblPerfilAtivo.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JPanel painelTipo = new JPanel(new FlowLayout(FlowLayout.CENTER, 16, 5));
+        painelTipo.setOpaque(false);
+        painelTipo.setMaximumSize(new Dimension(450, 50));
+
+        CustomBotao btnVoluntario = new CustomBotao("Voluntário", e -> {
+            tipoSelecionado = "Voluntario";
+            lblPerfilAtivo.setText("Perfil selecionado: Voluntário");
+        });
+
+        CustomBotao btnVeterinario = new CustomBotao("Veterinário", e -> {
+            tipoSelecionado = "Veterinario";
+            lblPerfilAtivo.setText("Perfil selecionado: Veterinário");
+        });
+
+        painelTipo.add(btnVoluntario);
+        painelTipo.add(btnVeterinario);
+
+       
+        JTextField txtNome = new JTextField(22);
+        JTextField txtCpf = new JTextField(22);
+        JTextField txtEmail = new JTextField(22);
+        JPasswordField txtSenha = new JPasswordField(22); 
+  
+        JPanel painelBotaoFinal = new JPanel(new FlowLayout(FlowLayout.CENTER, 16, 10));
+        painelBotaoFinal.setOpaque(false);
+
+        CustomBotao btnRegistrar = new CustomBotao("Registrar", e -> {
+            String nome = txtNome.getText().trim();
+            String cpf = txtCpf.getText().trim();
+            String email = txtEmail.getText().trim();
+            String senha = new String(txtSenha.getPassword()).trim();
+
+
+            if (nome.isEmpty() || cpf.isEmpty() || email.isEmpty() || senha.isEmpty()) {
+                JOptionPane.showMessageDialog(janela, "Por favor, preencha todos os campos.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            Usuario novoUsuario;
+           
+            if (tipoSelecionado.equals("Voluntario")) {
+                novoUsuario = new Voluntario(nome, email, senha, cpf);
+            } else {
+                novoUsuario = new Veterinario(nome, email, senha, cpf);
+            }
+
+
+            sisUser.cadastrarUsuario(novoUsuario);
+
+            JOptionPane.showMessageDialog(janela, tipoSelecionado + " cadastrado com sucesso!");
+            janela.dispose();
+        });
+
+        painelBotaoFinal.add(btnRegistrar);
+
+
+        painelPrincipal.add(lblTitulo);
+        painelPrincipal.add(Box.createVerticalStrut(10));
+        painelPrincipal.add(painelTipo);
+        painelPrincipal.add(Box.createVerticalStrut(4));
+        painelPrincipal.add(lblPerfilAtivo);
+        painelPrincipal.add(Box.createVerticalStrut(20));
+
+        painelPrincipal.add(criarLinhaCampo("Nome:", txtNome));
+        painelPrincipal.add(Box.createVerticalStrut(12));
+        painelPrincipal.add(criarLinhaCampo("CPF:", txtCpf));
+        painelPrincipal.add(Box.createVerticalStrut(12));
+        painelPrincipal.add(criarLinhaCampo("E-mail:", txtEmail));
+        painelPrincipal.add(Box.createVerticalStrut(12));
+        painelPrincipal.add(criarLinhaCampo("Senha:", txtSenha));
+        painelPrincipal.add(Box.createVerticalStrut(25));
+
+        painelPrincipal.add(painelBotaoFinal);
+
+        janela.setConteudo(painelPrincipal);
+        janela.setVisible(true);
+    }
+
+    private JPanel criarLinhaCampo(String textoLabel, JComponent campo) {
+        JPanel linha = new JPanel();
+        linha.setLayout(new BoxLayout(linha, BoxLayout.Y_AXIS));
+        linha.setOpaque(false);
+        linha.setMaximumSize(new Dimension(380, 55));
+        linha.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        CustomLabel lbl = new CustomLabel(textoLabel);
+        lbl.setAlignmentX(Component.LEFT_ALIGNMENT);
+        campo.setAlignmentX(Component.LEFT_ALIGNMENT);
+        campo.setMaximumSize(new Dimension(380, 30));
+
+        linha.add(lbl);
+        linha.add(Box.createVerticalStrut(4));
+        linha.add(campo);
+        return linha;
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\menu\MenuRelatorios.java ===
+package ong.menu;
+
+import ong.UI.*;
+import ong.service.Inventario;
+import ong.sistema.SistemaUsuario;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class MenuRelatorios {
+    private SistemaUsuario sisUser;
+    private Inventario inv;
+
+    public MenuRelatorios(SistemaUsuario sisUser, Inventario inv) {
+        this.sisUser = sisUser;
+        this.inv = inv;
+    }
+
+    public void mostrarTela() {
+        CustomFrame tela = new CustomFrame("Relatórios e Estatísticas - Abrigo Amigos Fofos", 780, 600);
+
+        JPanel painelPrincipal = new JPanel(new BorderLayout(16, 16));
+        painelPrincipal.setPreferredSize(new Dimension(740, 540));
+        painelPrincipal.setBorder(BorderFactory.createEmptyBorder(16, 24, 16, 24));
+        painelPrincipal.setOpaque(false);
+
+        JPanel painelTopo = new JPanel();
+        painelTopo.setLayout(new BoxLayout(painelTopo, BoxLayout.Y_AXIS));
+        painelTopo.setOpaque(false);
+
+        CustomLabel lblTitulo = new CustomLabel("RELATÓRIOS E ESTATÍSTICAS DA ONG", Font.BOLD, 22);
+
+        JPanel painelFiltroMeses = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 6));
+        painelFiltroMeses.setOpaque(false);
+        painelFiltroMeses.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        CustomLabel lblMeses = new CustomLabel("Período de operação (meses):");
+        CustomTextField txtMeses = new CustomTextField();
+        txtMeses.setText("1");
+        txtMeses.setPreferredSize(new Dimension(70, 34));
+
+        JTextArea areaRelatorio = new JTextArea();
+        areaRelatorio.setFont(new Font("Quicksand", Font.PLAIN, 14));
+        areaRelatorio.setEditable(false);
+        areaRelatorio.setLineWrap(true);
+        areaRelatorio.setWrapStyleWord(true);
+        areaRelatorio.setMargin(new Insets(12, 12, 12, 12));
+
+        Runnable atualizarRelatorio = () -> {
+            try {
+                int meses = Integer.parseInt(txtMeses.getText().trim());
+                if (meses <= 0) {
+                    JOptionPane.showMessageDialog(tela, "Informe uma quantidade de meses maior que zero.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                areaRelatorio.setText(inv.gerarRelatorioGeral(sisUser, meses));
+                areaRelatorio.setCaretPosition(0);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(tela, "Digite um número inteiro válido para os meses.", "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+        };
+
+        CustomBotao btnAtualizar = new CustomBotao("Atualizar Relatório", e -> atualizarRelatorio.run());
+        btnAtualizar.setFont(new Font("Quicksand", Font.BOLD, 15));
+
+        painelFiltroMeses.add(lblMeses);
+        painelFiltroMeses.add(txtMeses);
+        painelFiltroMeses.add(btnAtualizar);
+
+        painelTopo.add(lblTitulo);
+        painelTopo.add(Box.createVerticalStrut(10));
+        painelTopo.add(painelFiltroMeses);
+
+        JPanel painelRodape = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 4));
+        painelRodape.setOpaque(false);
+
+        CustomBotao btnFechar = new CustomBotao("Fechar", e -> tela.dispose());
+        btnFechar.setFont(new Font("Quicksand", Font.BOLD, 16));
+        painelRodape.add(btnFechar);
+
+        atualizarRelatorio.run();
+
+        painelPrincipal.add(painelTopo, BorderLayout.NORTH);
+        painelPrincipal.add(new JScrollPane(areaRelatorio), BorderLayout.CENTER);
+        painelPrincipal.add(painelRodape, BorderLayout.SOUTH);
+
+        tela.setConteudo(painelPrincipal);
+        tela.setVisible(true);
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\menu\MenuVeterinario.java ===
+package ong.menu;
+
+import ong.UI.*;
+import ong.animais.*;
+import ong.service.Inventario;
+import ong.usuario.Veterinario;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+
+public class MenuVeterinario {
+    private Veterinario user;
+    private Inventario inv;
+
+    public MenuVeterinario(Veterinario user, Inventario inv) {
+        this.user = user;
+        this.inv = inv;
+    }
+
+    public void mostrarTela() {
+        CustomFrame janela = new CustomFrame("Área do Veterinário - Abrigo Amigos Fofos", 720, 720);
+
+        CustomFormPanel painelFormulario = new CustomFormPanel(560, 620);
+
+        CustomLabel lblTitulo = new CustomLabel("Bem-vindo(a) Dr(a). " + user.getNome() + "!", Font.BOLD, 24);
+        lblTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        CustomBotao btnConsultarAnimais = new CustomBotao("Consultar Animais e Prontuários", e -> {
+            abrirJanelaConsultarAnimais();
+        });
+
+        CustomBotao btnRegistrarAtendimento = new CustomBotao("Registrar Consulta", e -> {
+            abrirJanelaRegistrarConsulta();
+        });
+
+        CustomBotao btnRegistrarProcedimento = new CustomBotao("Registrar Cirurgia / Tratamento", e -> {
+            abrirJanelaRegistrarProcedimento();
+        });
+
+        CustomBotao btnAtualizarTratamento = new CustomBotao("Atualizar Tratamento e Saúde", e -> {
+            abrirJanelaAtualizarTratamento();
+        });
+
+        CustomBotao btnRegistrarVacinacao = new CustomBotao("Registrar Vacinação", e -> {
+            abrirJanelaRegistrarVacinacao();
+        });
+
+        CustomBotao btnEmitirRelatorioMedico = new CustomBotao("Emitir Relatório Médico", e -> {
+            abrirJanelaEmitirRelatorio();
+        });
+
+        CustomBotao btnNotificacoes = new CustomBotao("Notificações", e -> {
+            new MenuNotificacoes(user, inv).mostrarTela();
+        });
+
+        btnConsultarAnimais.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnRegistrarAtendimento.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnRegistrarProcedimento.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnAtualizarTratamento.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnRegistrarVacinacao.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnEmitirRelatorioMedico.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnNotificacoes.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        painelFormulario.addComEspacamento(lblTitulo, 32);
+        painelFormulario.addComEspacamento(btnConsultarAnimais, 16);
+        painelFormulario.addComEspacamento(btnRegistrarAtendimento, 16);
+        painelFormulario.addComEspacamento(btnRegistrarProcedimento, 16);
+        painelFormulario.addComEspacamento(btnAtualizarTratamento, 16);
+        painelFormulario.addComEspacamento(btnRegistrarVacinacao, 16);
+        painelFormulario.addComEspacamento(btnEmitirRelatorioMedico, 16);
+        painelFormulario.addComEspacamento(btnNotificacoes, 0);
+
+        janela.setConteudo(painelFormulario);
+        janela.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        janela.setVisible(true);
+    }
+
+    private void abrirJanelaConsultarAnimais() {
+        CustomFrame tela = new CustomFrame("Prontuários dos Animais - Abrigo Amigos Fofos", 760, 560);
+
+        JPanel painelPrincipal = new JPanel(new BorderLayout(16, 16));
+        painelPrincipal.setPreferredSize(new Dimension(720, 500));
+        painelPrincipal.setBorder(BorderFactory.createEmptyBorder(16, 24, 16, 24));
+        painelPrincipal.setOpaque(false);
+
+        CustomLabel lblTitulo = new CustomLabel("ANIMAIS CADASTRADOS NO ABRIGO", Font.BOLD, 22);
+
+        String[] colunas = {"ID", "Nome", "Espécie", "Raça", "Estado de Saúde", "Status Adoção"};
+        DefaultTableModel modelo = new DefaultTableModel(colunas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        for (Animal a : inv.getAnimais()) {
+            modelo.addRow(new Object[]{
+                String.format("%02d", a.getId()),
+                a.getNome(),
+                a.getEspecie(),
+                a.getRaca(),
+                a.getEstadoSaude(),
+                a.getStatusAdocao()
+            });
+        }
+
+        JTable tabela = new JTable(modelo);
+        tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tabela.setRowHeight(26);
+        tabela.getTableHeader().setFont(new Font("Quicksand", Font.BOLD, 13));
+        tabela.setFont(new Font("Quicksand", Font.PLAIN, 13));
+
+        JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 14, 4));
+        painelBotoes.setOpaque(false);
+
+        CustomBotao btnProntuario = new CustomBotao("Ver Histórico Médico Completo", e -> {
+            int linha = tabela.getSelectedRow();
+            if (linha == -1) {
+                JOptionPane.showMessageDialog(tela, "Selecione um animal na tabela.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            int id = Integer.parseInt(modelo.getValueAt(linha, 0).toString());
+            exibirProntuarioCompleto(tela, id);
+        });
+        btnProntuario.setFont(new Font("Quicksand", Font.BOLD, 16));
+
+        CustomBotao btnFechar = new CustomBotao("Fechar", e -> tela.dispose());
+        btnFechar.setFont(new Font("Quicksand", Font.BOLD, 16));
+
+        painelBotoes.add(btnProntuario);
+        painelBotoes.add(btnFechar);
+
+        painelPrincipal.add(lblTitulo, BorderLayout.NORTH);
+        painelPrincipal.add(new JScrollPane(tabela), BorderLayout.CENTER);
+        painelPrincipal.add(painelBotoes, BorderLayout.SOUTH);
+
+        tela.setConteudo(painelPrincipal);
+        tela.setVisible(true);
+    }
+
+    private void abrirJanelaRegistrarConsulta() {
+        CustomFrame tela = new CustomFrame("Registrar Consulta Veterinária", 560, 620);
+        CustomFormPanel painel = new CustomFormPanel(460, 540);
+
+        CustomLabel lblTitulo = new CustomLabel("Registrar Consulta", Font.BOLD, 24);
+        CustomTextField txtIdAnimal = new CustomTextField();
+        CustomTextField txtData = new CustomTextField();
+        CustomTextField txtDiagnostico = new CustomTextField();
+        CustomTextField txtPrescricao = new CustomTextField();
+        CustomTextField txtNovoEstado = new CustomTextField();
+
+        CustomBotao btnSalvar = new CustomBotao("Salvar Consulta", e -> {
+            try {
+                int idAnimal = Integer.parseInt(txtIdAnimal.getText().trim());
+                String data = txtData.getText().trim();
+                String diag = txtDiagnostico.getText().trim();
+                String presc = txtPrescricao.getText().trim();
+                String estado = txtNovoEstado.getText().trim();
+
+                if (data.isEmpty() || diag.isEmpty() || presc.isEmpty() || estado.isEmpty()) {
+                    JOptionPane.showMessageDialog(tela, "Preencha todos os campos.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                int idConsulta = (int) (System.currentTimeMillis() % 10000);
+                boolean ok = inv.registrarConsulta(idConsulta, idAnimal, user, data, diag, presc, estado);
+                if (ok) {
+                    JOptionPane.showMessageDialog(tela, "Consulta #" + idConsulta + " registrada com sucesso!");
+                    tela.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(tela, "Animal não encontrado.", "Erro", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(tela, "ID do animal inválido.", "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        CustomBotao btnCancelar = new CustomBotao("Cancelar", e -> tela.dispose());
+
+        painel.addComEspacamento(lblTitulo, 20);
+        painel.addComEspacamento(new CustomLabel("ID do Animal:"), 4);
+        painel.addComEspacamento(txtIdAnimal, 12);
+        painel.addComEspacamento(new CustomLabel("Data (dd/mm/aaaa):"), 4);
+        painel.addComEspacamento(txtData, 12);
+        painel.addComEspacamento(new CustomLabel("Diagnóstico:"), 4);
+        painel.addComEspacamento(txtDiagnostico, 12);
+        painel.addComEspacamento(new CustomLabel("Prescrição / Medicamentos:"), 4);
+        painel.addComEspacamento(txtPrescricao, 12);
+        painel.addComEspacamento(new CustomLabel("Novo Estado de Saúde (ex: Saudável, Tratamento Critico):"), 4);
+        painel.addComEspacamento(txtNovoEstado, 20);
+        painel.addComEspacamento(btnSalvar, 10);
+        painel.addComEspacamento(btnCancelar, 0);
+
+        tela.setConteudo(painel);
+        tela.setVisible(true);
+    }
+
+    private void abrirJanelaRegistrarProcedimento() {
+        CustomFrame tela = new CustomFrame("Registrar Cirurgia ou Tratamento", 560, 620);
+        CustomFormPanel painel = new CustomFormPanel(460, 540);
+
+        CustomLabel lblTitulo = new CustomLabel("Registrar Cirurgia / Tratamento", Font.BOLD, 22);
+        CustomTextField txtIdAnimal = new CustomTextField();
+        CustomTextField txtTipo = new CustomTextField();
+        CustomTextField txtDescricao = new CustomTextField();
+        CustomTextField txtData = new CustomTextField();
+        CustomTextField txtStatus = new CustomTextField();
+
+        CustomBotao btnSalvar = new CustomBotao("Registrar Procedimento", e -> {
+            try {
+                int idAnimal = Integer.parseInt(txtIdAnimal.getText().trim());
+                String tipo = txtTipo.getText().trim();
+                String desc = txtDescricao.getText().trim();
+                String data = txtData.getText().trim();
+                String status = txtStatus.getText().trim();
+
+                if (tipo.isEmpty() || desc.isEmpty() || data.isEmpty() || status.isEmpty()) {
+                    JOptionPane.showMessageDialog(tela, "Preencha todos os campos.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                int idProc = (int) (System.currentTimeMillis() % 10000);
+                boolean ok = inv.registrarProcedimento(idProc, idAnimal, user, tipo, desc, data, status);
+                if (ok) {
+                    JOptionPane.showMessageDialog(tela, "Procedimento #" + idProc + " registrado com sucesso!");
+                    tela.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(tela, "Animal não encontrado.", "Erro", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(tela, "ID do animal inválido.", "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        CustomBotao btnCancelar = new CustomBotao("Cancelar", e -> tela.dispose());
+
+        painel.addComEspacamento(lblTitulo, 20);
+        painel.addComEspacamento(new CustomLabel("ID do Animal:"), 4);
+        painel.addComEspacamento(txtIdAnimal, 12);
+        painel.addComEspacamento(new CustomLabel("Tipo (ex: Cirurgia, Tratamento):"), 4);
+        painel.addComEspacamento(txtTipo, 12);
+        painel.addComEspacamento(new CustomLabel("Descrição:"), 4);
+        painel.addComEspacamento(txtDescricao, 12);
+        painel.addComEspacamento(new CustomLabel("Data (dd/mm/aaaa):"), 4);
+        painel.addComEspacamento(txtData, 12);
+        painel.addComEspacamento(new CustomLabel("Status (ex: Em andamento, Concluído):"), 4);
+        painel.addComEspacamento(txtStatus, 20);
+        painel.addComEspacamento(btnSalvar, 10);
+        painel.addComEspacamento(btnCancelar, 0);
+
+        tela.setConteudo(painel);
+        tela.setVisible(true);
+    }
+
+    private void abrirJanelaAtualizarTratamento() {
+        CustomFrame tela = new CustomFrame("Atualizar Tratamento e Saúde", 560, 560);
+        CustomFormPanel painel = new CustomFormPanel(460, 480);
+
+        CustomLabel lblTitulo = new CustomLabel("Atualizar Tratamento", Font.BOLD, 24);
+        CustomTextField txtIdAnimal = new CustomTextField();
+        CustomTextField txtIdProc = new CustomTextField();
+        CustomTextField txtNovoStatusProc = new CustomTextField();
+        CustomTextField txtNovoEstadoSaude = new CustomTextField();
+
+        CustomBotao btnAtualizar = new CustomBotao("Atualizar", e -> {
+            try {
+                int idAnimal = Integer.parseInt(txtIdAnimal.getText().trim());
+                int idProc = Integer.parseInt(txtIdProc.getText().trim());
+                String statusProc = txtNovoStatusProc.getText().trim();
+                String estadoSaude = txtNovoEstadoSaude.getText().trim();
+
+                if (statusProc.isEmpty() || estadoSaude.isEmpty()) {
+                    JOptionPane.showMessageDialog(tela, "Preencha todos os campos.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                boolean ok = inv.atualizarStatusTratamento(idAnimal, idProc, user, statusProc, estadoSaude);
+                if (ok) {
+                    JOptionPane.showMessageDialog(tela, "Tratamento e estado de saúde atualizados!");
+                    tela.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(tela, "Animal ou procedimento não encontrado.", "Erro", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(tela, "IDs devem ser numéricos.", "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        CustomBotao btnCancelar = new CustomBotao("Cancelar", e -> tela.dispose());
+
+        painel.addComEspacamento(lblTitulo, 20);
+        painel.addComEspacamento(new CustomLabel("ID do Animal:"), 4);
+        painel.addComEspacamento(txtIdAnimal, 12);
+        painel.addComEspacamento(new CustomLabel("ID do Procedimento:"), 4);
+        painel.addComEspacamento(txtIdProc, 12);
+        painel.addComEspacamento(new CustomLabel("Novo Status do Procedimento:"), 4);
+        painel.addComEspacamento(txtNovoStatusProc, 12);
+        painel.addComEspacamento(new CustomLabel("Novo Estado de Saúde do Animal:"), 4);
+        painel.addComEspacamento(txtNovoEstadoSaude, 20);
+        painel.addComEspacamento(btnAtualizar, 10);
+        painel.addComEspacamento(btnCancelar, 0);
+
+        tela.setConteudo(painel);
+        tela.setVisible(true);
+    }
+
+    private void abrirJanelaRegistrarVacinacao() {
+        CustomFrame tela = new CustomFrame("Registrar Vacinação", 560, 620);
+        CustomFormPanel painel = new CustomFormPanel(460, 540);
+
+        CustomLabel lblTitulo = new CustomLabel("Controle de Vacinas", Font.BOLD, 24);
+        CustomTextField txtIdAnimal = new CustomTextField();
+        CustomTextField txtNomeVacina = new CustomTextField();
+        CustomTextField txtDose = new CustomTextField();
+        CustomTextField txtDataAplicacao = new CustomTextField();
+        CustomTextField txtProximaDose = new CustomTextField();
+
+        CustomBotao btnSalvar = new CustomBotao("Registrar Vacina", e -> {
+            try {
+                int idAnimal = Integer.parseInt(txtIdAnimal.getText().trim());
+                String vacina = txtNomeVacina.getText().trim();
+                String dose = txtDose.getText().trim();
+                String dataAp = txtDataAplicacao.getText().trim();
+                String proxData = txtProximaDose.getText().trim();
+
+                if (vacina.isEmpty() || dose.isEmpty() || dataAp.isEmpty() || proxData.isEmpty()) {
+                    JOptionPane.showMessageDialog(tela, "Preencha todos os campos.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                int idVacina = (int) (System.currentTimeMillis() % 10000);
+                boolean ok = inv.registrarVacinacao(idVacina, idAnimal, user, vacina, dose, dataAp, proxData);
+                if (ok) {
+                    JOptionPane.showMessageDialog(tela, "Vacina registrada com sucesso!");
+                    tela.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(tela, "Erro ao registrar (animal inexistente ou vacina duplicada nesta data).", "Erro", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(tela, "ID do animal inválido.", "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        CustomBotao btnCancelar = new CustomBotao("Cancelar", e -> tela.dispose());
+
+        painel.addComEspacamento(lblTitulo, 20);
+        painel.addComEspacamento(new CustomLabel("ID do Animal:"), 4);
+        painel.addComEspacamento(txtIdAnimal, 12);
+        painel.addComEspacamento(new CustomLabel("Nome da Vacina:"), 4);
+        painel.addComEspacamento(txtNomeVacina, 12);
+        painel.addComEspacamento(new CustomLabel("Dose (ex: 1ª Dose, Reforço):"), 4);
+        painel.addComEspacamento(txtDose, 12);
+        painel.addComEspacamento(new CustomLabel("Data de Aplicação (dd/mm/aaaa):"), 4);
+        painel.addComEspacamento(txtDataAplicacao, 12);
+        painel.addComEspacamento(new CustomLabel("Data da Próxima Dose (dd/mm/aaaa):"), 4);
+        painel.addComEspacamento(txtProximaDose, 20);
+        painel.addComEspacamento(btnSalvar, 10);
+        painel.addComEspacamento(btnCancelar, 0);
+
+        tela.setConteudo(painel);
+        tela.setVisible(true);
+    }
+
+    private void abrirJanelaEmitirRelatorio() {
+        CustomTextField txtId = new CustomTextField();
+        Object[] msg = {new CustomLabel("Informe o ID do Animal para emitir o relatório de saúde:"), txtId};
+        if (JOptionPane.showConfirmDialog(null, msg, "Emitir Relatório Médico", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+            try {
+                int id = Integer.parseInt(txtId.getText().trim());
+                exibirProntuarioCompleto(null, id);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(null, "ID inválido.", "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void exibirProntuarioCompleto(Component parent, int idAnimal) {
+        Animal animal = inv.buscarPorId(idAnimal);
+        if (animal == null) {
+            JOptionPane.showMessageDialog(parent, "Animal não encontrado.", "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("PRONTUÁRIO MÉDICO - ").append(animal.getNome().toUpperCase()).append("\n");
+        sb.append("ID: ").append(String.format("%02d", animal.getId()))
+          .append(" | Espécie: ").append(animal.getEspecie())
+          .append(" | Raça: ").append(animal.getRaca()).append("\n");
+        sb.append("Estado de Saúde Atual: ").append(animal.getEstadoSaude()).append("\n\n");
+
+        sb.append("=== CONSULTAS E MEDICAMENTOS ===\n");
+        if (animal.getHistoricoConsultas().isEmpty()) {
+            sb.append("Nenhuma consulta registrada.\n");
+        } else {
+            for (Consulta c : animal.getHistoricoConsultas()) {
+                sb.append("#").append(c.getIdConsulta()).append(" [").append(c.getData()).append("] Dr(a). ")
+                  .append(c.getVeterinario().getNome()).append("\nDiagnóstico: ").append(c.getDiagnostico())
+                  .append(" | Prescrição: ").append(c.getPrescricao()).append("\n\n");
+            }
+        }
+
+        sb.append("=== CIRURGIAS E TRATAMENTOS ===\n");
+        if (animal.getHistoricoProcedimentos().isEmpty()) {
+            sb.append("Nenhum procedimento registrado.\n");
+        } else {
+            for (ProcedimentoMedico p : animal.getHistoricoProcedimentos()) {
+                sb.append("#").append(p.getIdProcedimento()).append(" [").append(p.getData()).append("] ")
+                  .append(p.getTipo()).append(" - ").append(p.getStatus()).append("\nDescrição: ")
+                  .append(p.getDescricao()).append(" (Dr(a). ").append(p.getVeterinario().getNome()).append(")\n\n");
+            }
+        }
+
+        sb.append("=== CARTEIRA DE VACINAÇÃO ===\n");
+        if (animal.getCarteiraVacinacao().isEmpty()) {
+            sb.append("Nenhuma vacina registrada.\n");
+        } else {
+            for (Vacina v : animal.getCarteiraVacinacao()) {
+                sb.append("#").append(v.getIdVacina()).append(" ").append(v.getNomeVacina())
+                  .append(" (").append(v.getDose()).append(") - Aplicada: ").append(v.getDataAplicacao())
+                  .append(" | Próxima: ").append(v.getDataProximaDose()).append("\n");
+            }
+        }
+
+        JTextArea area = new JTextArea(sb.toString(), 22, 52);
+        area.setFont(new Font("Quicksand", Font.PLAIN, 13));
+        area.setEditable(false);
+        area.setLineWrap(true);
+        area.setWrapStyleWord(true);
+
+        JOptionPane.showMessageDialog(parent, new JScrollPane(area), "Relatório de Saúde", JOptionPane.INFORMATION_MESSAGE);
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\menu\MenuVoluntario.java ===
+package ong.menu;
+
+import ong.UI.*;
+import ong.animais.*;
+import ong.eventos.Atividade;
+import ong.usuario.Voluntario;
+import ong.service.Inventario;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.util.ArrayList;
+
+public class MenuVoluntario {
+    private Voluntario user;
+    private Inventario inv;
+
+    public MenuVoluntario(Voluntario user, Inventario inv) {
+        this.user = user;
+        this.inv = inv;
+    }
+
+    public void mostrarTela() {
+        CustomFrame janela = new CustomFrame("Área do Voluntário - Abrigo Amigos Fofos", 720, 680);
+
+        CustomFormPanel painelFormulario = new CustomFormPanel(560, 560);
+
+        CustomLabel lblTitulo = new CustomLabel("Bem-vindo(a) " + user.getNome() + "!", Font.BOLD, 24);
+        lblTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        CustomBotao btnVisuAnimais = new CustomBotao("Visualizar Animais Disponíveis", e -> {
+            new MenuAnimaisDisponiveis(inv, user).mostrarTela();
+        });
+
+        CustomBotao btnConsultarAdocoes = new CustomBotao("Consultar Minhas Solicitações", e -> {
+            abrirJanelaConsultarAdocoes();
+        });
+
+        CustomBotao btnAnimaisResp = new CustomBotao("Animais Sob Minha Responsabilidade", e -> {
+            abrirJanelaAnimaisResponsabilidade();
+        });
+
+        CustomBotao btnParticiparEventos = new CustomBotao("Participar de Eventos", e -> {
+            new MenuEventos(user, inv).mostrarTela();
+        });
+
+        CustomBotao btnHistoricoParticipacoes = new CustomBotao("Histórico de Participações", e -> {
+            abrirJanelaHistoricoParticipacoes();
+        });
+
+        CustomBotao btnNotificacoes = new CustomBotao("Notificações", e -> {
+            new MenuNotificacoes(user, inv).mostrarTela();
+        });
+
+        btnVisuAnimais.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnConsultarAdocoes.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnAnimaisResp.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnParticiparEventos.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnHistoricoParticipacoes.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnNotificacoes.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        painelFormulario.addComEspacamento(lblTitulo, 36);
+        painelFormulario.addComEspacamento(btnVisuAnimais, 18);
+        painelFormulario.addComEspacamento(btnConsultarAdocoes, 18);
+        painelFormulario.addComEspacamento(btnAnimaisResp, 18);
+        painelFormulario.addComEspacamento(btnParticiparEventos, 18);
+        painelFormulario.addComEspacamento(btnHistoricoParticipacoes, 18);
+        painelFormulario.addComEspacamento(btnNotificacoes, 0);
+
+        janela.setConteudo(painelFormulario);
+        janela.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        janela.setVisible(true);
+    }
+
+    private void abrirJanelaConsultarAdocoes() {
+        ArrayList<SolicitacaoAdocao> minhasSolicitacoes = inv.buscarSolicitacoesPorCpf(user.getCpf());
+
+        CustomFrame telaConsulta = new CustomFrame("Minhas Solicitações - Abrigo Amigos Fofos", 720, 500);
+
+        JPanel painelPrincipal = new JPanel(new BorderLayout(16, 16));
+        painelPrincipal.setPreferredSize(new Dimension(680, 440));
+        painelPrincipal.setBorder(BorderFactory.createEmptyBorder(16, 24, 16, 24));
+        painelPrincipal.setOpaque(false);
+
+        CustomLabel lblTitulo = new CustomLabel("MINHAS SOLICITAÇÕES DE ADOÇÃO", Font.BOLD, 20);
+
+        String[] colunas = {"ID Solicitação", "ID Animal", "Animal", "Espécie", "Status"};
+        DefaultTableModel modelo = new DefaultTableModel(colunas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        for (SolicitacaoAdocao sol : minhasSolicitacoes) {
+            modelo.addRow(new Object[]{
+                String.format("%04d", sol.getIdSolicitacao()),
+                String.format("%02d", sol.getAnimal().getId()),
+                sol.getAnimal().getNome(),
+                sol.getAnimal().getEspecie(),
+                sol.getStatus()
+            });
+        }
+
+        JTable tabela = new JTable(modelo);
+        tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tabela.setRowHeight(26);
+        tabela.getTableHeader().setFont(new Font("Quicksand", Font.BOLD, 13));
+        tabela.setFont(new Font("Quicksand", Font.PLAIN, 13));
+
+        JScrollPane scroll = new JScrollPane(tabela);
+
+        JPanel painelRodape = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        painelRodape.setOpaque(false);
+
+        CustomBotao btnFechar = new CustomBotao("Fechar", e -> telaConsulta.dispose());
+        painelRodape.add(btnFechar);
+
+        painelPrincipal.add(lblTitulo, BorderLayout.NORTH);
+        painelPrincipal.add(scroll, BorderLayout.CENTER);
+        painelPrincipal.add(painelRodape, BorderLayout.SOUTH);
+
+        telaConsulta.setConteudo(painelPrincipal);
+        telaConsulta.setVisible(true);
+
+        if (minhasSolicitacoes.isEmpty()) {
+            JOptionPane.showMessageDialog(telaConsulta, "Você ainda não possui solicitações registradas.", "Informação", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
+    private void abrirJanelaAnimaisResponsabilidade() {
+        CustomFrame telaResp = new CustomFrame("Animais Sob Minha Responsabilidade", 740, 520);
+
+        JPanel painelPrincipal = new JPanel(new BorderLayout(16, 16));
+        painelPrincipal.setPreferredSize(new Dimension(700, 460));
+        painelPrincipal.setBorder(BorderFactory.createEmptyBorder(16, 24, 16, 24));
+        painelPrincipal.setOpaque(false);
+
+        CustomLabel lblTitulo = new CustomLabel("ANIMAIS SOB MINHA RESPONSABILIDADE", Font.BOLD, 20);
+
+        String[] colunas = {"ID", "Nome", "Espécie", "Saúde", "Status Adoção"};
+        DefaultTableModel modelo = new DefaultTableModel(colunas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        Runnable recarregar = () -> {
+            modelo.setRowCount(0);
+            for (Animal a : user.getAnimaisResponsavel()) {
+                modelo.addRow(new Object[]{
+                    String.format("%02d", a.getId()),
+                    a.getNome(),
+                    a.getEspecie(),
+                    a.getEstadoSaude(),
+                    a.getStatusAdocao()
+                });
+            }
+        };
+        recarregar.run();
+
+        JTable tabela = new JTable(modelo);
+        tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tabela.setRowHeight(26);
+        tabela.getTableHeader().setFont(new Font("Quicksand", Font.BOLD, 13));
+        tabela.setFont(new Font("Quicksand", Font.PLAIN, 13));
+
+        JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 4));
+        painelBotoes.setOpaque(false);
+
+        CustomBotao btnAssumir = new CustomBotao("Assumir Cuidado (por ID)", e -> {
+            CustomTextField txtId = new CustomTextField();
+            Object[] msg = {new CustomLabel("ID do Animal no abrigo:"), txtId};
+            if (JOptionPane.showConfirmDialog(telaResp, msg, "Assumir Responsabilidade", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                try {
+                    int id = Integer.parseInt(txtId.getText().trim());
+                    Animal a = inv.buscarPorId(id);
+                    if (a != null) {
+                        user.addAnimalResponsavel(a);
+                        recarregar.run();
+                    } else {
+                        JOptionPane.showMessageDialog(telaResp, "Animal não encontrado.", "Erro", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(telaResp, "ID inválido.", "Erro", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        btnAssumir.setFont(new Font("Quicksand", Font.BOLD, 16));
+
+        CustomBotao btnFechar = new CustomBotao("Fechar", e -> telaResp.dispose());
+        btnFechar.setFont(new Font("Quicksand", Font.BOLD, 16));
+
+        painelBotoes.add(btnAssumir);
+        painelBotoes.add(btnFechar);
+
+        painelPrincipal.add(lblTitulo, BorderLayout.NORTH);
+        painelPrincipal.add(new JScrollPane(tabela), BorderLayout.CENTER);
+        painelPrincipal.add(painelBotoes, BorderLayout.SOUTH);
+
+        telaResp.setConteudo(painelPrincipal);
+        telaResp.setVisible(true);
+    }
+
+    private void abrirJanelaHistoricoParticipacoes() {
+        CustomFrame telaHist = new CustomFrame("Participações em Ações da ONG", 760, 520);
+
+        JPanel painelPrincipal = new JPanel(new BorderLayout(16, 16));
+        painelPrincipal.setPreferredSize(new Dimension(720, 460));
+        painelPrincipal.setBorder(BorderFactory.createEmptyBorder(16, 24, 16, 24));
+        painelPrincipal.setOpaque(false);
+
+        CustomLabel lblTitulo = new CustomLabel("MINHAS ATIVIDADES E HISTÓRICO", Font.BOLD, 20);
+
+        String[] colunas = {"ID", "Título", "Tipo", "Data", "Local", "Situação"};
+        DefaultTableModel modelo = new DefaultTableModel(colunas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        Runnable recarregar = () -> {
+            modelo.setRowCount(0);
+            for (Atividade atv : user.getAtvAtivas()) {
+                modelo.addRow(new Object[]{atv.getId(), atv.getTitulo(), atv.getTipo(), atv.getData(), atv.getLocal(), "Inscrito (Ativa)"});
+            }
+            for (Atividade atv : user.getHistorico()) {
+                modelo.addRow(new Object[]{atv.getId(), atv.getTitulo(), atv.getTipo(), atv.getData(), atv.getLocal(), "Concluída"});
+            }
+        };
+        recarregar.run();
+
+        JTable tabela = new JTable(modelo);
+        tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tabela.setRowHeight(26);
+        tabela.getTableHeader().setFont(new Font("Quicksand", Font.BOLD, 13));
+        tabela.setFont(new Font("Quicksand", Font.PLAIN, 13));
+
+        JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 4));
+        painelBotoes.setOpaque(false);
+
+        CustomBotao btnConcluir = new CustomBotao("Marcar como Concluída", e -> {
+            int linha = tabela.getSelectedRow();
+            if (linha == -1) {
+                JOptionPane.showMessageDialog(telaHist, "Selecione uma atividade ativa na tabela.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            String situacao = modelo.getValueAt(linha, 5).toString();
+            if (!situacao.startsWith("Inscrito")) {
+                JOptionPane.showMessageDialog(telaHist, "Esta atividade já foi concluída.", "Aviso", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            int idAtv = Integer.parseInt(modelo.getValueAt(linha, 0).toString());
+            Atividade alvo = inv.buscarAtividadePorId(idAtv);
+            if (alvo != null) {
+                user.concluirAtividadeAtiva(alvo);
+                recarregar.run();
+            }
+        });
+        btnConcluir.setFont(new Font("Quicksand", Font.BOLD, 16));
+
+        CustomBotao btnFechar = new CustomBotao("Fechar", e -> telaHist.dispose());
+        btnFechar.setFont(new Font("Quicksand", Font.BOLD, 16));
+
+        painelBotoes.add(btnConcluir);
+        painelBotoes.add(btnFechar);
+
+        painelPrincipal.add(lblTitulo, BorderLayout.NORTH);
+        painelPrincipal.add(new JScrollPane(tabela), BorderLayout.CENTER);
+        painelPrincipal.add(painelBotoes, BorderLayout.SOUTH);
+
+        telaHist.setConteudo(painelPrincipal);
+        telaHist.setVisible(true);
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\service\Inventario.java ===
+package ong.service;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import ong.animais.*;
+import ong.eventos.*;
+import ong.sistema.SistemaUsuario;
+import ong.usuario.*;
+
+public class Inventario {
+    private ArrayList<Animal> animais;
+    private ArrayList<SolicitacaoAdocao> solicitacoes;
+    private ArrayList<Atividade> atividades;
+    private ArrayList<Consulta> historicoConsultas = new ArrayList<>();
+    private ArrayList<Notificacao> notificacoes = new ArrayList<>();
+    private int contadorNotificacoes = 1;
+
+    public Inventario() {
+        animais = new ArrayList<>();
+        solicitacoes = new ArrayList<>();
+        atividades = new ArrayList<>();
+    }
+
+    private String dataHoje() {
+        return LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    }
+
+    public void registrarNotificacao(String categoria, String mensagem, String data, String cpfDestinatario) {
+        notificacoes.add(new Notificacao(contadorNotificacoes++, categoria, mensagem, data, cpfDestinatario));
+    }
+
+    public ArrayList<Notificacao> getNotificacoesParaUsuario(Usuario user) {
+        ArrayList<Notificacao> resultado = new ArrayList<>();
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate hoje = LocalDate.now();
+
+        for (Animal a : animais) {
+            for (Vacina v : a.getCarteiraVacinacao()) {
+                try {
+                    LocalDate dataProx = LocalDate.parse(v.getDataProximaDose(), fmt);
+                    long diasRestantes = ChronoUnit.DAYS.between(hoje, dataProx);
+                    if (diasRestantes <= 30) {
+                        String textoDias = diasRestantes < 0
+                            ? "vencida há " + Math.abs(diasRestantes) + " dia(s)"
+                            : "vence em " + diasRestantes + " dia(s) (" + v.getDataProximaDose() + ")";
+                        resultado.add(new Notificacao(
+                            0,
+                            "Vacina Próxima do Vencimento",
+                            "Animal " + a.getNome() + " (ID " + String.format("%02d", a.getId()) + ") - Vacina " + v.getNomeVacina() + " " + textoDias + ".",
+                            dataHoje(),
+                            null
+                        ));
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+        }
+
+        for (int i = notificacoes.size() - 1; i >= 0; i--) {
+            Notificacao n = notificacoes.get(i);
+            if (n.getCpfDestinatario() == null ||
+                n.getCpfDestinatario().equals(user.getCpf()) ||
+                user instanceof Administrador) {
+                resultado.add(n);
+            }
+        }
+
+        return resultado;
+    }
+
+    public ArrayList<Animal> getAnimais() {
+        return this.animais;
+    }
+
+    public ArrayList<SolicitacaoAdocao> getSolicitacoes() {
+        return this.solicitacoes;
+    }
+
+    public ArrayList<Atividade> getAtividades() {
+        return this.atividades;
+    }
+
+    public void addAtividade(Atividade atividade) {
+        atividades.add(atividade);
+        registrarNotificacao(
+            "Próximo Evento",
+            "Nova atividade agendada: " + atividade.getTitulo() + " (" + atividade.getTipo() + ") em " + atividade.getData() + " - Local: " + atividade.getLocal() + ".",
+            dataHoje(),
+            null
+        );
+    }
+
+    public boolean removerAtividade(int id) {
+        Atividade alvo = buscarAtividadePorId(id);
+        if (alvo != null) {
+            atividades.remove(alvo);
+            return true;
+        }
+        return false;
+    }
+
+    public Atividade buscarAtividadePorId(int id) {
+        for (Atividade a : atividades) {
+            if (a.getId() == id) {
+                return a;
+            }
+        }
+        return null;
+    }
+
+    public void addAnimal(Animal animal) {
+        animais.add(animal);
+        registrarNotificacao(
+            "Novo Animal Cadastrado",
+            "Novo animal resgatado: " + animal.getNome() + " (" + animal.getEspecie() + " - " + animal.getRaca() + ").",
+            animal.getDataResgate(),
+            null
+        );
+    }
+
+    public Animal buscarPorId(int id) {
+        for (Animal animal : animais) {
+            if (animal.getId() == id) {
+                return animal;
+            }
+        }
+        return null;
+    }
+
+    public boolean removerAnimal(int id) {
+        Animal animal = buscarPorId(id);
+        if (animal != null) {
+            if (animal.getStatusAdocao().equalsIgnoreCase("Adotado")) {
+                return false;
+            }
+            animais.remove(animal);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean editarAnimal(int id, String novoNome, String novaRaca, int novaIdade,
+                                String novoPorte, String novoEstadoSaude, String novaDataResgate,
+                                String novoStatusAdocao) {
+        Animal animal = buscarPorId(id);
+        if (animal != null) {
+            animal.setNome(novoNome);
+            animal.setRaca(novaRaca);
+            animal.setIdade(novaIdade);
+            animal.setPorte(novoPorte);
+            animal.setEstadoSaude(novoEstadoSaude);
+            animal.setDataResgate(novaDataResgate);
+            animal.setStatusAdocao(novoStatusAdocao);
+            return true;
+        }
+        return false;
+    }
+
+    public ArrayList<Animal> filtrarPorEspecie(String especie) {
+        ArrayList<Animal> resultados = new ArrayList<>();
+        for (Animal animal : animais) {
+            if (especie.equalsIgnoreCase("Cachorro") && animal instanceof Cachorro) {
+                resultados.add(animal);
+            } else if (especie.equalsIgnoreCase("Gato") && animal instanceof Gato) {
+                resultados.add(animal);
+            }
+        }
+        return resultados;
+    }
+
+    public ArrayList<Animal> buscarPorNome(String termoBusca) {
+        ArrayList<Animal> resultados = new ArrayList<>();
+        for (Animal animal : animais) {
+            if (animal.getNome().toLowerCase().contains(termoBusca.toLowerCase())) {
+                resultados.add(animal);
+            }
+        }
+        return resultados;
+    }
+
+    public void displayInventario() {
+        for (Animal animal : animais) {
+            System.out.println(animal.toString());
+        }
+    }
+
+    public boolean solicitarAdocao(int idSolicitacao, int idAnimal, String nomeCandidato, String cpfCandidato) {
+        Animal animal = buscarPorId(idAnimal);
+        if (animal == null) {
+            throw new IllegalArgumentException("Erro: Animal nao encontrado.");
+        }
+
+        if (animal.getEstadoSaude().equalsIgnoreCase("Critico") || animal.getEstadoSaude().equalsIgnoreCase("Tratamento Critico")) {
+            throw new IllegalStateException("Erro: O animal " + animal.getNome() + " esta em tratamento critico e nao pode ser adotado.");
+        }
+
+        if (!animal.getStatusAdocao().equalsIgnoreCase("Disponivel") && !animal.getStatusAdocao().equalsIgnoreCase("Disponível")) {
+            throw new IllegalStateException("Erro: O animal " + animal.getNome() + " esta indisponivel para adocao (Status: " + animal.getStatusAdocao() + ").");
+        }
+
+        SolicitacaoAdocao novaSol = new SolicitacaoAdocao(idSolicitacao, animal, nomeCandidato, cpfCandidato);
+        solicitacoes.add(novaSol);
+        registrarNotificacao(
+            "Atualização de Adoção",
+            "Solicitação #" + String.format("%04d", idSolicitacao) + " recebida para " + animal.getNome() + " (Candidato: " + nomeCandidato + ") - Status: Pendente.",
+            dataHoje(),
+            cpfCandidato
+        );
+        return true;
+    }
+
+    public ArrayList<SolicitacaoAdocao> buscarSolicitacoesPorCpf(String cpf) {
+        ArrayList<SolicitacaoAdocao> resultados = new ArrayList<>();
+        for (SolicitacaoAdocao sol : solicitacoes) {
+            if (sol.getCpfCandidato().equals(cpf)) {
+                resultados.add(sol);
+            }
+        }
+        return resultados;
+    }
+
+    public SolicitacaoAdocao buscarSolicitacaoPorId(int idSolicitacao) {
+        for (SolicitacaoAdocao sol : solicitacoes) {
+            if (sol.getIdSolicitacao() == idSolicitacao) {
+                return sol;
+            }
+        }
+        return null;
+    }
+
+    public boolean aprovarAdocao(int idSolicitacao, boolean isAdmin) {
+        if (!isAdmin) {
+            return false;
+        }
+
+        SolicitacaoAdocao sol = buscarSolicitacaoPorId(idSolicitacao);
+        if (sol != null && sol.getStatus().equalsIgnoreCase("Pendente")) {
+            if (sol.getAnimal().getStatusAdocao().equalsIgnoreCase("Adotado")) {
+                return false;
+            }
+            sol.setStatus("Aprovado");
+            sol.getAnimal().setStatusAdocao("Adotado");
+            registrarNotificacao(
+                "Atualização de Adoção",
+                "Solicitação #" + String.format("%04d", sol.getIdSolicitacao()) + " para " + sol.getAnimal().getNome() + " foi APROVADA!",
+                dataHoje(),
+                sol.getCpfCandidato()
+            );
+
+            for (SolicitacaoAdocao outra : solicitacoes) {
+                if (outra.getIdSolicitacao() != idSolicitacao &&
+                    outra.getAnimal().getId() == sol.getAnimal().getId() &&
+                    outra.getStatus().equalsIgnoreCase("Pendente")) {
+                    outra.setStatus("Rejeitado");
+                    registrarNotificacao(
+                        "Atualização de Adoção",
+                        "Solicitação #" + String.format("%04d", outra.getIdSolicitacao()) + " para " + outra.getAnimal().getNome() + " foi REJEITADA (animal adotado).",
+                        dataHoje(),
+                        outra.getCpfCandidato()
+                    );
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public boolean rejeitarAdocao(int idSolicitacao, boolean isAdmin) {
+        if (!isAdmin) {
+            return false;
+        }
+
+        SolicitacaoAdocao sol = buscarSolicitacaoPorId(idSolicitacao);
+        if (sol != null && sol.getStatus().equalsIgnoreCase("Pendente")) {
+            sol.setStatus("Rejeitado");
+            registrarNotificacao(
+                "Atualização de Adoção",
+                "Solicitação #" + String.format("%04d", sol.getIdSolicitacao()) + " para " + sol.getAnimal().getNome() + " foi REJEITADA.",
+                dataHoje(),
+                sol.getCpfCandidato()
+            );
+            return true;
+        }
+        return false;
+    }
+
+    public boolean registrarDevolucao(int idAnimal) {
+        Animal animal = buscarPorId(idAnimal);
+        if (animal != null && animal.getStatusAdocao().equalsIgnoreCase("Adotado")) {
+            animal.setStatusAdocao("Disponível");
+            registrarNotificacao(
+                "Aviso Geral do Abrigo",
+                "O animal " + animal.getNome() + " (ID " + String.format("%02d", animal.getId()) + ") retornou ao abrigo e está disponível para adoção.",
+                dataHoje(),
+                null
+            );
+            return true;
+        }
+        return false;
+    }
+
+    public void adicionarConsulta(Consulta consulta) {
+        this.historicoConsultas.add(consulta);
+    }
+
+    public ArrayList<Consulta> getHistoricoConsultas() {
+        return historicoConsultas;
+    }
+
+    public boolean registrarConsulta(int idConsulta, int idAnimal, Usuario usuarioLogado, String data, String diagnostico, String prescricao, String novoEstadoSaude) {
+        if (!(usuarioLogado instanceof Veterinario)) {
+            return false;
+        }
+
+        Animal animal = buscarPorId(idAnimal);
+        if (animal != null) {
+            Veterinario vet = (Veterinario) usuarioLogado;
+            Consulta novaConsulta = new Consulta(idConsulta, animal, vet, data, diagnostico, prescricao);
+            animal.adicionarConsulta(novaConsulta);
+            historicoConsultas.add(novaConsulta);
+            animal.setEstadoSaude(novoEstadoSaude);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean registrarProcedimento(int idProcedimento, int idAnimal, Usuario usuarioLogado, String tipo, String descricao, String data, String status) {
+        if (!(usuarioLogado instanceof Veterinario)) {
+            return false;
+        }
+
+        Animal animal = buscarPorId(idAnimal);
+        if (animal != null) {
+            Veterinario vet = (Veterinario) usuarioLogado;
+            ProcedimentoMedico proc = new ProcedimentoMedico(idProcedimento, animal, vet, tipo, descricao, data, status);
+            animal.adicionarProcedimento(proc);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean atualizarStatusTratamento(int idAnimal, int idProcedimento, Usuario usuarioLogado, String novoStatus, String novoEstadoSaude) {
+        if (!(usuarioLogado instanceof Veterinario)) {
+            return false;
+        }
+
+        Animal animal = buscarPorId(idAnimal);
+        if (animal != null) {
+            for (ProcedimentoMedico p : animal.getHistoricoProcedimentos()) {
+                if (p.getIdProcedimento() == idProcedimento) {
+                    p.setStatus(novoStatus);
+                    animal.setEstadoSaude(novoEstadoSaude);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean registrarVacinacao(int idVacina, int idAnimal, Usuario usuarioLogado, String nomeVacina, String dose, String dataAplicacao, String dataProximaDose) {
+        if (!(usuarioLogado instanceof Veterinario)) {
+            return false;
+        }
+
+        Animal animal = buscarPorId(idAnimal);
+        if (animal != null) {
+            for (Vacina v : animal.getCarteiraVacinacao()) {
+                if (v.getNomeVacina().equalsIgnoreCase(nomeVacina) && v.getDataAplicacao().equals(dataAplicacao)) {
+                    return false;
+                }
+            }
+
+            Veterinario vet = (Veterinario) usuarioLogado;
+            Vacina novaVacina = new Vacina(idVacina, animal, vet, nomeVacina, dose, dataAplicacao, dataProximaDose);
+            animal.adicionarVacina(novaVacina);
+            return true;
+        }
+        return false;
+    }
+
+    public int getQuantidadeAnimaisResgatados() {
+        return animais.size();
+    }
+
+    public int getQuantidadeAdocoesRealizadas() {
+        int total = 0;
+        for (SolicitacaoAdocao sol : solicitacoes) {
+            if (sol.getStatus().equalsIgnoreCase("Aprovado")) {
+                total++;
+            }
+        }
+        return total;
+    }
+
+    public String getEspecieMaisResgatada() {
+        if (animais.isEmpty()) {
+            return "Nenhum animal cadastrado";
+        }
+        int caes = 0;
+        int gatos = 0;
+        int outros = 0;
+        for (Animal a : animais) {
+            if (a instanceof Cachorro) {
+                caes++;
+            } else if (a instanceof Gato) {
+                gatos++;
+            } else {
+                outros++;
+            }
+        }
+        if (caes >= gatos && caes >= outros) {
+            return "Cachorro (Cachorros: " + caes + " | Gatos: " + gatos + " | Outros: " + outros + ")";
+        } else if (gatos >= caes && gatos >= outros) {
+            return "Gato (Cachorros: " + caes + " | Gatos: " + gatos + " | Outros: " + outros + ")";
+        } else {
+            return "Outros (Cachorros: " + caes + " | Gatos: " + gatos + " | Outros: " + outros + ")";
+        }
+    }
+
+    public double calcularTaxaAdocaoMensal(int totalMesesPeriodo) {
+        if (totalMesesPeriodo <= 0 || animais.isEmpty()) {
+            return 0.0;
+        }
+        double mediaMensal = (double) getQuantidadeAdocoesRealizadas() / totalMesesPeriodo;
+        return (mediaMensal / animais.size()) * 100.0;
+    }
+
+    public int getNumeroVoluntariosAtivos(SistemaUsuario sisUser) {
+        return sisUser.contarVoluntariosAtivos();
+    }
+
+    public String gerarRelatorioGeral(SistemaUsuario sisUser, int mesesOperacao) {
+        String relatorio = "=== RELATÓRIO E ESTATÍSTICAS DA ONG ===\n\n" +
+            "- Quantidade de animais resgatados: " + getQuantidadeAnimaisResgatados() + "\n" +
+            "- Quantidade de adoções realizadas: " + getQuantidadeAdocoesRealizadas() + "\n" +
+            "- Espécie mais resgatada: " + getEspecieMaisResgatada() + "\n" +
+            String.format("- Taxa de adoção mensal (%d meses): %.2f%%\n", mesesOperacao, calcularTaxaAdocaoMensal(mesesOperacao)) +
+            "- Número de voluntários ativos: " + getNumeroVoluntariosAtivos(sisUser) + "\n\n" +
+            "--- Animais em Tratamento ---\n";
+
+        boolean temTratamento = false;
+        for (Animal a : animais) {
+            String saude = a.getEstadoSaude().toLowerCase();
+            String status = a.getStatusAdocao().toLowerCase();
+            if (saude.contains("tratamento") || saude.contains("recupera") || saude.contains("critico") || status.contains("tratamento")) {
+                relatorio += "- ID " + a.getId() + " | " + a.getNome() + " (" + a.getEspecie() + ") | Estado: " + a.getEstadoSaude() + "\n";
+                temTratamento = true;
+            }
+        }
+        if (!temTratamento) {
+            relatorio += "Nenhum animal em tratamento no momento.\n";
+        }
+        return relatorio;
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\service\Notificacao.java ===
+package ong.service;
+
+public class Notificacao {
+    private final int id;
+    private String categoria;
+    private String mensagem;
+    private String data;
+    private String cpfDestinatario;
+
+    public Notificacao(int id, String categoria, String mensagem, String data, String cpfDestinatario) {
+        this.id = id;
+        this.categoria = categoria;
+        this.mensagem = mensagem;
+        this.data = data;
+        this.cpfDestinatario = cpfDestinatario;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public String getMensagem() {
+        return mensagem;
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public String getCpfDestinatario() {
+        return cpfDestinatario;
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\sistema\SistemaUsuario.java ===
+package ong.sistema;
+
+import java.util.ArrayList;
+import ong.usuario.*;
+
+public class SistemaUsuario {
+    private ArrayList<Usuario> todosUsuarios = new ArrayList<>();
+
+    public void cadastrarUsuario(Usuario u) {
+        todosUsuarios.add(u);
+    }
+
+    public ArrayList<Usuario> getTodosUsuarios() {
+        return todosUsuarios;
+    }
+
+    public boolean removerUsuario(String email) {
+        Usuario alvo = buscarPorEmail(email);
+        if (alvo != null) {
+            todosUsuarios.remove(alvo);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean promoverParaAdmin(String email) {
+        Usuario alvo = buscarPorEmail(email);
+        if (alvo != null && !(alvo instanceof Administrador)) {
+            Administrador novoAdmin = new Administrador(alvo.getNome(), alvo.getEmail(), alvo.getSenha(), alvo.getCpf());
+            todosUsuarios.remove(alvo);
+            todosUsuarios.add(novoAdmin);
+            return true;
+        }
+        return false;
+    }
+
+    public Usuario buscarPorEmail(String email) {
+        for (Usuario u : todosUsuarios) {
+            if (validarEmail(u, email)) {
+                return u;
+            }
+        }
+        return null;
+    }
+
+    public void mostrarUsuarios() {
+        for (Usuario u : todosUsuarios) {
+            System.out.printf(u.getNome() + " - email: " + u.getEmail() + ".\n");
+        }
+    }
+
+    public Usuario validarLogin(String email, String senha) {
+        for (Usuario u : todosUsuarios) {
+            if (validarEmail(u, email) && u.validarSenha(senha)) {
+                return u;
+            }
+        }
+        return null;
+    }
+
+    public boolean validarEmail(Usuario u, String email) {
+        return u.getEmail().equalsIgnoreCase(email.trim());
+    }
+
+    public int contarVoluntariosAtivos() {
+        int total = 0;
+        for (Usuario u : todosUsuarios) {
+            if (u instanceof Voluntario) {
+                total++;
+            }
+        }
+        return total;
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\UI\CustomBotao.java ===
+package ong.UI;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionListener;
+
+
+public class CustomBotao extends JButton {
+    public CustomBotao(String texto, ActionListener acaoClique){
+        super(texto);
+
+        setFont(new Font("Quicksand", Font.BOLD, 24));
+
+        setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
+        setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        setFocusPainted(false);
+
+        if (acaoClique != null) {
+            addActionListener(acaoClique);
+        }
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\UI\CustomFormPanel.java ===
+package ong.UI;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class CustomFormPanel extends JPanel{
+    public CustomFormPanel(int largura, int altura){
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setBackground(Color.WHITE);
+        setPreferredSize(new Dimension(largura, altura));
+    }
+
+    public void addComEspacamento(JComponent componente, int espacamento){
+        add(componente);
+        if(espacamento > 0){
+            add(Box.createRigidArea(new Dimension(0, espacamento)));
+        }
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\UI\CustomFrame.java ===
+package ong.UI;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class CustomFrame extends JFrame{
+    private JPanel painelPrincipal;
+
+    public CustomFrame(String titulo, int largura, int altura){
+        setTitle(titulo);
+        setSize(largura, altura);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        painelPrincipal = new JPanel(new GridBagLayout());
+        painelPrincipal.setBackground(Color.WHITE);
+
+        add(painelPrincipal);
+
+    }
+
+    public void setConteudo(JComponent componente){
+        painelPrincipal.removeAll();
+        painelPrincipal.add(componente, new GridBagConstraints());
+        revalidate();
+        repaint();
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\UI\CustomLabel.java ===
+package ong.UI;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class CustomLabel extends JLabel{
+    //texto comum
+    public CustomLabel(String txt){
+        super(txt);
+        configurarEstilo(Font.PLAIN, 16);
+    }
+
+    //titulos ou texto personalizado
+    public CustomLabel(String txt, int estilo, int tamanho){
+        super(txt);
+        configurarEstilo(estilo, tamanho);
+    }
+
+    //texto clicavel
+    public CustomLabel(String txt, boolean isHtml){
+        super(txt);
+        if(isHtml){
+            configurarEstilo(Font.PLAIN, 12);
+            setAlignmentX(Component.LEFT_ALIGNMENT);
+            setCursor(new Cursor(Cursor.HAND_CURSOR));
+        }
+    }
+
+
+    private void configurarEstilo(int estilo, int tamanho){
+        setFont(new Font("Quicksand", estilo, tamanho));
+        setAlignmentX(Component.LEFT_ALIGNMENT);
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\UI\CustomPasswordField.java ===
+package ong.UI;
+
+import javax.swing.*;
+import java.awt.*;
+
+
+public class CustomPasswordField extends JPasswordField{
+    public CustomPasswordField(){
+        super();
+        configurarEstilo();
+    }
+
+    private void configurarEstilo(){
+        setFont(new Font("Quicksand", Font.PLAIN, 16));
+        setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
+        setAlignmentX(Component.LEFT_ALIGNMENT);
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\UI\CustomTextField.java ===
+package ong.UI;
+
+import javax.swing.*;
+import java.awt.*;
+
+
+public class CustomTextField extends JTextField{
+    public CustomTextField(){
+        super();
+        configurarEstilo();
+    }
+
+    private void configurarEstilo(){
+        setFont(new Font("Quicksand", Font.PLAIN, 16));
+        setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
+        setAlignmentX(Component.LEFT_ALIGNMENT);
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\usuario\Administrador.java ===
+package ong.usuario;
+
+public class Administrador extends Usuario {
+
+    public Administrador(String nome, String email, String senha, String CPF){
+        super(nome, email, senha, CPF);
+    }
+
+    //Vou fazer um menu de gerenciamento.
+    //Ele vai chamar essas funcoes aq.
+    public void removerUsuario(){
+
+    }
+
+    public void promoverUsuarioAdm(){
+
+    }
+
+    public void exibirRelatorioUsuario(){
+        //aqui eu acho que vou fazer mostrar o
+        // historico de atividades do Vol. e do Vet.
+        // além das atividades ativas.
+    }
+
+    // Atividades
+    public void addAtividadesNoSistema(){
+
+    }
+    public void rmvAtividadesNoSistema(){
+
+    }
+
+    //Esperando pra saber o que vai ter de dado dos animais
+    public void cadastrarAnimal(){
+
+    }
+    //acho que vou fazer via ID.
+    public void editarAnimal(){
+
+    }
+    //acho que vou fazer via ID.
+    public void removerAnimal(){
+
+    }
+
+    public void aprovarAdocao(){
+
+    }
+
+    public void rejeitarAdocao(){
+
+    }
+
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\usuario\Usuario.java ===
+package ong.usuario;
+
+public abstract class Usuario {
+    private String nome;
+    private String email;
+    private String senha;
+    private final String CPF;
+
+    public Usuario(String nome, String email, String senha, String CPF) {
+        this.nome = nome;
+        this.email = email;
+        this.senha = senha;
+        this.CPF = CPF;
+    }
+
+    public String getNome() {
+        return this.nome;
+    }
+
+    public String getEmail() {
+        return this.email;
+    }
+
+    public String getSenha() {
+        return this.senha;
+    }
+
+    public String getCpf() {
+        return this.CPF;
+    }
+
+    public boolean validarSenha(String senhaDigitada) {
+        return this.senha != null && this.senha.equals(senhaDigitada);
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\usuario\Veterinario.java ===
+package ong.usuario;
+import ong.service.Inventario;
+
+public class Veterinario extends Usuario {
+
+    public Veterinario(String nome, String email, String senha, String cpf){
+        super(nome, email, senha, cpf);
+    }
+
+    public void consultarAnimais(){
+
+    }
+
+    public void registrarAtendimento(){
+
+    }
+
+    public void registrarVacinacao(){
+
+    }
+
+    public void atualizarTratamento(){
+
+    }
+
+    public void emitirRelatorioMedico(){
+
+    }
+    public boolean registrarAtendimento(Inventario inventario, int idConsulta, int idAnimal, String data, String diagnostico, String prescricao, String novoEstadoSaude){
+        return inventario.registrarConsulta(idConsulta, idAnimal, this, data, diagnostico, prescricao, novoEstadoSaude);
+    }
+    public boolean registrarVacinacao(Inventario inventario, int idVacina, int idAnimal, String nomeVacina, String dose, String dataAplicacao, String dataProximaDose){
+        return inventario.registrarVacinacao(idVacina, idAnimal, this, nomeVacina, dose, dataAplicacao, dataProximaDose);
+    }
+}
+
+
+
+=== ARQUIVO: E:\ONG\src\ong\usuario\Voluntario.java ===
+package ong.usuario;
+
+import ong.animais.Animal;
+import ong.eventos.Atividade;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Voluntario extends Usuario {
+    private List<Atividade> historico = new ArrayList<>();
+    private List<Atividade> atvAtivas = new ArrayList<>();
+    private List<Animal> animaisResponsavel = new ArrayList<>();
+
+    public Voluntario(String nome, String email, String senha, String CPF) {
+        super(nome, email, senha, CPF);
+    }
+
+    public List<Atividade> getHistorico() {
+        return this.historico;
+    }
+
+    public List<Atividade> getAtvAtivas() {
+        return this.atvAtivas;
+    }
+
+    public void addAtividadeAtiva(Atividade atv) {
+        this.atvAtivas.add(atv);
+    }
+
+    public void concluirAtividadeAtiva(Atividade atv) {
+        if (this.atvAtivas.contains(atv)) {
+            this.historico.add(atv);
+            this.atvAtivas.remove(atv);
+        }
+    }
+
+    public void addAnimalResponsavel(Animal animal) {
+        if (!this.animaisResponsavel.contains(animal)) {
+            this.animaisResponsavel.add(animal);
+        }
+    }
+
+    public List<Animal> getAnimaisResponsavel() {
+        return this.animaisResponsavel;
+    }
+}
+
+
+

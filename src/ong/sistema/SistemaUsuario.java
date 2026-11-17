@@ -1,13 +1,7 @@
 package ong.sistema;
 
 import java.util.ArrayList;
-<<<<<<< HEAD
 import ong.usuario.*;
-=======
-import ong.usuario.Usuario;
-import ong.usuario.Voluntario;
-
->>>>>>> main
 
 public class SistemaUsuario {
     private ArrayList<Usuario> todosUsuarios = new ArrayList<>();
@@ -55,7 +49,6 @@ public class SistemaUsuario {
         }
     }
 
-<<<<<<< HEAD
     public Usuario validarLogin(String email, String senha) {
         for (Usuario u : todosUsuarios) {
             if (validarEmail(u, email) && u.validarSenha(senha)) {
@@ -68,8 +61,8 @@ public class SistemaUsuario {
     public boolean validarEmail(Usuario u, String email) {
         return u.getEmail().equalsIgnoreCase(email.trim());
     }
-=======
-    public int getQuantidadeVoluntarios() {
+
+    public int contarVoluntariosAtivos() {
         int total = 0;
         for (Usuario u : todosUsuarios) {
             if (u instanceof Voluntario) {
@@ -78,6 +71,4 @@ public class SistemaUsuario {
         }
         return total;
     }
-
->>>>>>> main
 }
