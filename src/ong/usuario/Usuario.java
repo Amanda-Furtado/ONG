@@ -21,10 +21,6 @@ public abstract class Usuario {
         return this.email;
     }
 
-    public String getSenha() {
-        return this.senha;
-    }
-
     public String getCpf() {
         return this.CPF;
     }

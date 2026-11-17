@@ -1,11 +1,10 @@
 package ong.menu;
 
+import java.awt.*;
+import javax.swing.*;
 import ong.UI.*;
 import ong.service.Inventario;
 import ong.sistema.SistemaUsuario;
-
-import javax.swing.*;
-import java.awt.*;
 
 public class MenuRelatorios {
     private SistemaUsuario sisUser;

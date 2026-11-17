@@ -1,12 +1,10 @@
 package ong.menu;
 
-import ong.sistema.SistemaUsuario;
-import ong.service.*;
-import ong.UI.*;
-
-import javax.swing.*;
-
 import java.awt.*;
+import javax.swing.*;
+import ong.UI.*;
+import ong.service.*;
+import ong.sistema.SistemaUsuario;
 
 
 public class MenuPrincipal {

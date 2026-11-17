@@ -1,11 +1,10 @@
 package ong.menu;
 
+import java.awt.*;
+import javax.swing.*;
 import ong.UI.*;
 import ong.sistema.SistemaUsuario;
 import ong.usuario.*;
-
-import javax.swing.*;
-import java.awt.*;
 
 public class MenuRegistrar {
     private SistemaUsuario sisUser;
@@ -22,7 +21,7 @@ public class MenuRegistrar {
         painelPrincipal.setLayout(new BoxLayout(painelPrincipal, BoxLayout.Y_AXIS));
         painelPrincipal.setBorder(BorderFactory.createEmptyBorder(25, 40, 25, 40));
         painelPrincipal.setOpaque(false);
-        painelPrincipal.setPreferredSize(new Dimension(460, 520));
+        painelPrincipal.setPreferredSize(new Dimension(800, 520));
 
         
         CustomLabel lblTitulo = new CustomLabel("Registrar como:", Font.BOLD, 22);
@@ -31,9 +30,11 @@ public class MenuRegistrar {
         CustomLabel lblPerfilAtivo = new CustomLabel("Perfil selecionado: Voluntário", Font.ITALIC, 13);
         lblPerfilAtivo.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+    
         JPanel painelTipo = new JPanel(new FlowLayout(FlowLayout.CENTER, 16, 5));
         painelTipo.setOpaque(false);
-        painelTipo.setMaximumSize(new Dimension(450, 50));
+        painelTipo.setMaximumSize(new Dimension(700, 400)); 
+
 
         CustomBotao btnVoluntario = new CustomBotao("Voluntário", e -> {
             tipoSelecionado = "Voluntario";
