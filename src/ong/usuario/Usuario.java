@@ -6,28 +6,26 @@ public abstract class Usuario {
     private String senha;
     private final String CPF;
 
-
-    public Usuario (String nome, String email, String senha, String CPF){
+    public Usuario(String nome, String email, String senha, String CPF) {
         this.nome = nome;
         this.email = email;
         this.senha = senha;
         this.CPF = CPF;
     }
 
-    public String getNome(){
+    public String getNome() {
         return this.nome;
     }
 
-    public String getEmail(){
+    public String getEmail() {
         return this.email;
     }
 
-    public String getCPF(){
+    public String getCpf() {
         return this.CPF;
     }
 
-    public boolean validarSenha(String senhaDigitada){
+    public boolean validarSenha(String senhaDigitada) {
         return this.senha != null && this.senha.equals(senhaDigitada);
     }
-    
 }

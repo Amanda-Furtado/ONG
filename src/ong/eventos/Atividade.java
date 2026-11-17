@@ -1,13 +1,10 @@
 package ong.eventos;
 
-
 import ong.usuario.Voluntario;
-
 import java.util.ArrayList;
 import java.util.List;
 
-
-public abstract class Atividade{
+public abstract class Atividade {
     private int id;
     private String titulo;
     private String descricao;
@@ -15,8 +12,8 @@ public abstract class Atividade{
     private String local;
     private int vagasDisponiveis;
     private List<Voluntario> voluntariosInscritos;
-    
-    public Atividade(int id, String titulo, String descricao, String data, String local, int vagasDisponiveis){
+
+    public Atividade(int id, String titulo, String descricao, String data, String local, int vagasDisponiveis) {
         this.id = id;
         this.titulo = titulo;
         this.descricao = descricao;
@@ -24,13 +21,10 @@ public abstract class Atividade{
         this.local = local;
         this.vagasDisponiveis = vagasDisponiveis;
         this.voluntariosInscritos = new ArrayList<>();
-
     }
-    
-    //vou testar fazer a inscricao aqui, mas se 
-    // fica mto baguncado eu mudo depois.
-    public boolean inscreverVoluntario(Voluntario voluntario){
-        if(vagasDisponiveis > 0 && !voluntariosInscritos.contains(voluntario)){
+
+    public boolean inscreverVoluntario(Voluntario voluntario) {
+        if (vagasDisponiveis > 0 && !voluntariosInscritos.contains(voluntario)) {
             voluntariosInscritos.add(voluntario);
             vagasDisponiveis--;
             voluntario.addAtividadeAtiva(this);
@@ -39,24 +33,35 @@ public abstract class Atividade{
         return false;
     }
 
-    public int getId(){
+    public int getId() {
         return this.id;
     }
-    
-    public String getTitulo(){
+
+    public String getTitulo() {
         return this.titulo;
     }
 
-    public String getData(){
+    public String getDescricao() {
+        return this.descricao;
+    }
+
+    public String getData() {
         return this.data;
     }
 
-    public String getLocal(){
+    public String getLocal() {
         return this.local;
     }
 
-    public int getVagasDisponiveis(){
+    public int getVagasDisponiveis() {
         return this.vagasDisponiveis;
     }
 
+    public List<Voluntario> getVoluntariosInscritos() {
+        return this.voluntariosInscritos;
+    }
+
+    public String getTipo() {
+        return this.getClass().getSimpleName();
+    }
 }

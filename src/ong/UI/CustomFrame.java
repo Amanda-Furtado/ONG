@@ -9,7 +9,7 @@ public class CustomFrame extends JFrame{
     public CustomFrame(String titulo, int largura, int altura){
         setTitle(titulo);
         setSize(largura, altura);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
         painelPrincipal = new JPanel(new GridBagLayout());

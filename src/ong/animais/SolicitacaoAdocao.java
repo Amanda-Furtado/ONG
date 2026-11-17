@@ -12,7 +12,7 @@ public class SolicitacaoAdocao{
         this.animal = animal;
         this.nomeCandidato = nomeCandidato;
         this.cpfCandidato = cpfCandidato;
-        this.status = "Pendente"; // Toda solicitação nasce como pendente
+        this.status = "Pendente";
     }
 
     public int getIdSolicitacao(){
