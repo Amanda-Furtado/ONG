@@ -1,12 +1,16 @@
 package ong;
 
+import ong.menu.*;
 import ong.sistema.*;
 import ong.animais.*;
 import ong.usuario.*;
+<<<<<<< HEAD
 import ong.service.Inventario;
 import ong.sistema.*;
 import ong.menu.*;
 import ong.service.*;
+=======
+>>>>>>> main
 
 public class Main {
     public static void main (String args[]){
