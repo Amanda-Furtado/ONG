@@ -1,5 +1,8 @@
 package ong.service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import ong.animais.*;
 import ong.eventos.*;
@@ -10,11 +13,60 @@ public class Inventario {
     private ArrayList<SolicitacaoAdocao> solicitacoes;
     private ArrayList<Atividade> atividades;
     private ArrayList<Consulta> historicoConsultas = new ArrayList<>();
+    private ArrayList<Notificacao> notificacoes = new ArrayList<>();
+    private int contadorNotificacoes = 1;
 
     public Inventario() {
         animais = new ArrayList<>();
         solicitacoes = new ArrayList<>();
         atividades = new ArrayList<>();
+    }
+
+    private String dataHoje() {
+        return LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    }
+
+    public void registrarNotificacao(String categoria, String mensagem, String data, String cpfDestinatario) {
+        notificacoes.add(new Notificacao(contadorNotificacoes++, categoria, mensagem, data, cpfDestinatario));
+    }
+
+    public ArrayList<Notificacao> getNotificacoesParaUsuario(Usuario user) {
+        ArrayList<Notificacao> resultado = new ArrayList<>();
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate hoje = LocalDate.now();
+
+        for (Animal a : animais) {
+            for (Vacina v : a.getCarteiraVacinacao()) {
+                try {
+                    LocalDate dataProx = LocalDate.parse(v.getDataProximaDose(), fmt);
+                    long diasRestantes = ChronoUnit.DAYS.between(hoje, dataProx);
+                    if (diasRestantes <= 30) {
+                        String textoDias = diasRestantes < 0
+                            ? "vencida há " + Math.abs(diasRestantes) + " dia(s)"
+                            : "vence em " + diasRestantes + " dia(s) (" + v.getDataProximaDose() + ")";
+                        resultado.add(new Notificacao(
+                            0,
+                            "Vacina Próxima do Vencimento",
+                            "Animal " + a.getNome() + " (ID " + String.format("%02d", a.getId()) + ") - Vacina " + v.getNomeVacina() + " " + textoDias + ".",
+                            dataHoje(),
+                            null
+                        ));
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+        }
+
+        for (int i = notificacoes.size() - 1; i >= 0; i--) {
+            Notificacao n = notificacoes.get(i);
+            if (n.getCpfDestinatario() == null ||
+                n.getCpfDestinatario().equals(user.getCpf()) ||
+                user instanceof Administrador) {
+                resultado.add(n);
+            }
+        }
+
+        return resultado;
     }
 
     public ArrayList<Animal> getAnimais() {
@@ -31,6 +83,12 @@ public class Inventario {
 
     public void addAtividade(Atividade atividade) {
         atividades.add(atividade);
+        registrarNotificacao(
+            "Próximo Evento",
+            "Nova atividade agendada: " + atividade.getTitulo() + " (" + atividade.getTipo() + ") em " + atividade.getData() + " - Local: " + atividade.getLocal() + ".",
+            dataHoje(),
+            null
+        );
     }
 
     public boolean removerAtividade(int id) {
@@ -53,6 +111,12 @@ public class Inventario {
 
     public void addAnimal(Animal animal) {
         animais.add(animal);
+        registrarNotificacao(
+            "Novo Animal Cadastrado",
+            "Novo animal resgatado: " + animal.getNome() + " (" + animal.getEspecie() + " - " + animal.getRaca() + ").",
+            animal.getDataResgate(),
+            null
+        );
     }
 
     public Animal buscarPorId(int id) {
@@ -137,6 +201,12 @@ public class Inventario {
 
         SolicitacaoAdocao novaSol = new SolicitacaoAdocao(idSolicitacao, animal, nomeCandidato, cpfCandidato);
         solicitacoes.add(novaSol);
+        registrarNotificacao(
+            "Atualização de Adoção",
+            "Solicitação #" + String.format("%04d", idSolicitacao) + " recebida para " + animal.getNome() + " (Candidato: " + nomeCandidato + ") - Status: Pendente.",
+            dataHoje(),
+            cpfCandidato
+        );
         return true;
     }
 
@@ -171,11 +241,24 @@ public class Inventario {
             }
             sol.setStatus("Aprovado");
             sol.getAnimal().setStatusAdocao("Adotado");
+            registrarNotificacao(
+                "Atualização de Adoção",
+                "Solicitação #" + String.format("%04d", sol.getIdSolicitacao()) + " para " + sol.getAnimal().getNome() + " foi APROVADA!",
+                dataHoje(),
+                sol.getCpfCandidato()
+            );
+
             for (SolicitacaoAdocao outra : solicitacoes) {
                 if (outra.getIdSolicitacao() != idSolicitacao &&
                     outra.getAnimal().getId() == sol.getAnimal().getId() &&
                     outra.getStatus().equalsIgnoreCase("Pendente")) {
                     outra.setStatus("Rejeitado");
+                    registrarNotificacao(
+                        "Atualização de Adoção",
+                        "Solicitação #" + String.format("%04d", outra.getIdSolicitacao()) + " para " + outra.getAnimal().getNome() + " foi REJEITADA (animal adotado).",
+                        dataHoje(),
+                        outra.getCpfCandidato()
+                    );
                 }
             }
             return true;
@@ -191,6 +274,12 @@ public class Inventario {
         SolicitacaoAdocao sol = buscarSolicitacaoPorId(idSolicitacao);
         if (sol != null && sol.getStatus().equalsIgnoreCase("Pendente")) {
             sol.setStatus("Rejeitado");
+            registrarNotificacao(
+                "Atualização de Adoção",
+                "Solicitação #" + String.format("%04d", sol.getIdSolicitacao()) + " para " + sol.getAnimal().getNome() + " foi REJEITADA.",
+                dataHoje(),
+                sol.getCpfCandidato()
+            );
             return true;
         }
         return false;
@@ -200,6 +289,12 @@ public class Inventario {
         Animal animal = buscarPorId(idAnimal);
         if (animal != null && animal.getStatusAdocao().equalsIgnoreCase("Adotado")) {
             animal.setStatusAdocao("Disponível");
+            registrarNotificacao(
+                "Aviso Geral do Abrigo",
+                "O animal " + animal.getNome() + " (ID " + String.format("%02d", animal.getId()) + ") retornou ao abrigo e está disponível para adoção.",
+                dataHoje(),
+                null
+            );
             return true;
         }
         return false;

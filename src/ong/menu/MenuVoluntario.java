@@ -49,7 +49,7 @@ public class MenuVoluntario {
         });
 
         CustomBotao btnNotificacoes = new CustomBotao("Notificações", e -> {
-            abrirJanelaNotificacoes();
+            new MenuNotificacoes(user, inv).mostrarTela();
         });
 
         btnVisuAnimais.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -273,20 +273,5 @@ public class MenuVoluntario {
 
         telaHist.setConteudo(painelPrincipal);
         telaHist.setVisible(true);
-    }
-
-    private void abrirJanelaNotificacoes() {
-        StringBuilder sb = new StringBuilder();
-        for (SolicitacaoAdocao sol : inv.buscarSolicitacoesPorCpf(user.getCpf())) {
-            sb.append("- Solicitação #").append(String.format("%04d", sol.getIdSolicitacao()))
-              .append(" (").append(sol.getAnimal().getNome()).append("): ")
-              .append(sol.getStatus()).append("\n");
-        }
-        for (Atividade atv : user.getAtvAtivas()) {
-            sb.append("- Atividade agendada: ").append(atv.getTitulo())
-              .append(" em ").append(atv.getData()).append(" (").append(atv.getLocal()).append(")\n");
-        }
-        String texto = sb.length() == 0 ? "Nenhuma notificação no momento." : sb.toString();
-        JOptionPane.showMessageDialog(null, texto, "Notificações", JOptionPane.INFORMATION_MESSAGE);
     }
 }

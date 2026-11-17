@@ -19,9 +19,9 @@ public class MenuVeterinario {
     }
 
     public void mostrarTela() {
-        CustomFrame janela = new CustomFrame("Área do Veterinário - Abrigo Amigos Fofos", 720, 660);
+        CustomFrame janela = new CustomFrame("Área do Veterinário - Abrigo Amigos Fofos", 720, 720);
 
-        CustomFormPanel painelFormulario = new CustomFormPanel(560, 560);
+        CustomFormPanel painelFormulario = new CustomFormPanel(560, 620);
 
         CustomLabel lblTitulo = new CustomLabel("Bem-vindo(a) Dr(a). " + user.getNome() + "!", Font.BOLD, 24);
         lblTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -50,20 +50,26 @@ public class MenuVeterinario {
             abrirJanelaEmitirRelatorio();
         });
 
+        CustomBotao btnNotificacoes = new CustomBotao("Notificações", e -> {
+            new MenuNotificacoes(user, inv).mostrarTela();
+        });
+
         btnConsultarAnimais.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnRegistrarAtendimento.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnRegistrarProcedimento.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnAtualizarTratamento.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnRegistrarVacinacao.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnEmitirRelatorioMedico.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnNotificacoes.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        painelFormulario.addComEspacamento(lblTitulo, 36);
-        painelFormulario.addComEspacamento(btnConsultarAnimais, 18);
-        painelFormulario.addComEspacamento(btnRegistrarAtendimento, 18);
-        painelFormulario.addComEspacamento(btnRegistrarProcedimento, 18);
-        painelFormulario.addComEspacamento(btnAtualizarTratamento, 18);
-        painelFormulario.addComEspacamento(btnRegistrarVacinacao, 18);
-        painelFormulario.addComEspacamento(btnEmitirRelatorioMedico, 0);
+        painelFormulario.addComEspacamento(lblTitulo, 32);
+        painelFormulario.addComEspacamento(btnConsultarAnimais, 16);
+        painelFormulario.addComEspacamento(btnRegistrarAtendimento, 16);
+        painelFormulario.addComEspacamento(btnRegistrarProcedimento, 16);
+        painelFormulario.addComEspacamento(btnAtualizarTratamento, 16);
+        painelFormulario.addComEspacamento(btnRegistrarVacinacao, 16);
+        painelFormulario.addComEspacamento(btnEmitirRelatorioMedico, 16);
+        painelFormulario.addComEspacamento(btnNotificacoes, 0);
 
         janela.setConteudo(painelFormulario);
         janela.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -347,7 +353,7 @@ public class MenuVeterinario {
         painel.addComEspacamento(txtDose, 12);
         painel.addComEspacamento(new CustomLabel("Data de Aplicação (dd/mm/aaaa):"), 4);
         painel.addComEspacamento(txtDataAplicacao, 12);
-        painel.addComEspacamento(new CustomLabel("Data da Próxima Dose:"), 4);
+        painel.addComEspacamento(new CustomLabel("Data da Próxima Dose (dd/mm/aaaa):"), 4);
         painel.addComEspacamento(txtProximaDose, 20);
         painel.addComEspacamento(btnSalvar, 10);
         painel.addComEspacamento(btnCancelar, 0);

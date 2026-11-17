@@ -23,9 +23,9 @@ public class MenuAdmin {
     }
 
     public void mostrarTela() {
-        CustomFrame janela = new CustomFrame("Área do Administrador - Abrigo Amigos Fofos", 720, 680);
+        CustomFrame janela = new CustomFrame("Área do Administrador - Abrigo Amigos Fofos", 720, 720);
 
-        CustomFormPanel painelFormulario = new CustomFormPanel(560, 580);
+        CustomFormPanel painelFormulario = new CustomFormPanel(560, 620);
 
         CustomLabel lblTitulo = new CustomLabel("Bem-vindo(a) Administrador(a) " + user.getNome() + "!", Font.BOLD, 22);
         lblTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -54,20 +54,26 @@ public class MenuAdmin {
             abrirJanelaEstatisticas();
         });
 
+        CustomBotao btnNotificacoes = new CustomBotao("Notificações e Avisos", e -> {
+            new MenuNotificacoes(user, inv).mostrarTela();
+        });
+
         btnGerenciarAnimais.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnGerenciarUsuarios.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnAprovarAdocoes.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnGerenciarEventos.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnRelatorios.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnEstatisticas.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnNotificacoes.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        painelFormulario.addComEspacamento(lblTitulo, 36);
-        painelFormulario.addComEspacamento(btnGerenciarAnimais, 18);
-        painelFormulario.addComEspacamento(btnGerenciarUsuarios, 18);
-        painelFormulario.addComEspacamento(btnAprovarAdocoes, 18);
-        painelFormulario.addComEspacamento(btnGerenciarEventos, 18);
-        painelFormulario.addComEspacamento(btnRelatorios, 18);
-        painelFormulario.addComEspacamento(btnEstatisticas, 0);
+        painelFormulario.addComEspacamento(lblTitulo, 32);
+        painelFormulario.addComEspacamento(btnGerenciarAnimais, 16);
+        painelFormulario.addComEspacamento(btnGerenciarUsuarios, 16);
+        painelFormulario.addComEspacamento(btnAprovarAdocoes, 16);
+        painelFormulario.addComEspacamento(btnGerenciarEventos, 16);
+        painelFormulario.addComEspacamento(btnRelatorios, 16);
+        painelFormulario.addComEspacamento(btnEstatisticas, 16);
+        painelFormulario.addComEspacamento(btnNotificacoes, 0);
 
         janela.setConteudo(painelFormulario);
         janela.setExtendedState(JFrame.MAXIMIZED_BOTH);
