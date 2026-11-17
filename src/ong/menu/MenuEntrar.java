@@ -3,15 +3,18 @@ package ong.menu;
 import ong.UI.*;
 import ong.sistema.SistemaUsuario;
 import ong.usuario.*;
+import ong.service.Inventario;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class MenuEntrar {
     private SistemaUsuario sisUser;
+    private Inventario inv;
 
-    public MenuEntrar(SistemaUsuario sisUser){
+    public MenuEntrar(SistemaUsuario sisUser, Inventario inv){
         this.sisUser = sisUser;
+        this.inv = inv;
     }
     
     public void mostrarTela() {
@@ -28,14 +31,14 @@ public class MenuEntrar {
         CustomPasswordField txtSenha = new CustomPasswordField();
   
         CustomBotao btnEntrar = new CustomBotao("Entrar", e -> {
-            String email = txtEmail.getText();
+            String email = txtEmail.getText().trim();
             String senha = new String(txtSenha.getPassword());
             
             Usuario userLogado = sisUser.validarLogin(email, senha);
 
             if(userLogado != null){
                 if(userLogado instanceof Voluntario){
-                    new MenuVoluntario((Voluntario) userLogado).mostrarTela();
+                    new MenuVoluntario((Voluntario) userLogado, this.inv).mostrarTela();
                 }else if(userLogado instanceof Veterinario){
                     new MenuVeterinario((Veterinario) userLogado).mostrarTela();
                 }else{

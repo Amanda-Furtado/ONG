@@ -72,9 +72,9 @@ public class MenuRegistrar {
             Usuario novoUsuario;
            
             if (tipoSelecionado.equals("Voluntario")) {
-                novoUsuario = new Voluntario(nome, cpf, email, senha);
+                novoUsuario = new Voluntario(nome, email, senha, cpf);
             } else {
-                novoUsuario = new Veterinario(nome, cpf, email, senha);
+                novoUsuario = new Veterinario(nome, email, senha, cpf);
             }
 
 

@@ -18,10 +18,7 @@ public class MenuPrincipal {
     }
 
     public void mostrarMenu(){
-        JFrame janela = new JFrame();
-        janela.setSize(750, 500);
-        janela.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        janela.setLocationRelativeTo(null);
+        CustomFrame janela = new CustomFrame("Login - Abrigo Amigos Fofos", 720, 480);
         janela.setLayout(new BorderLayout());
 
         // Textos
@@ -51,7 +48,7 @@ public class MenuPrincipal {
 
 
         CustomBotao btnEntrar = new CustomBotao("Entrar", e -> {
-            new MenuEntrar(this.sisUser).mostrarTela();
+            new MenuEntrar(this.sisUser, this.inv).mostrarTela();
         });
 
         CustomBotao btnRegistrar = new CustomBotao("Registrar", e -> {
@@ -59,7 +56,7 @@ public class MenuPrincipal {
         });
 
         CustomBotao btnVisuAnimais = new CustomBotao("Visualizar Animais Disponíveis", e -> {
-            new MenuAnimaisDisponiveis(inv).mostrarTela();
+            new MenuAnimaisDisponiveis(this.inv).mostrarTela();
 
         });
 

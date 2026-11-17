@@ -2,15 +2,18 @@ package ong.menu;
 
 import ong.UI.*;
 import ong.usuario.Voluntario;
+import ong.service.Inventario;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class MenuVoluntario{
     private Voluntario user;
+    private Inventario inv;
 
-    public MenuVoluntario(Voluntario user){
+    public MenuVoluntario(Voluntario user, Inventario inv){
         this.user = user;
+        this.inv = inv;
     }
 
     public void mostrarTela() {
@@ -20,8 +23,8 @@ public class MenuVoluntario{
 
         CustomLabel lblTitulo = new CustomLabel("Bem-vindo(a) " + user.getNome() + "!", Font.BOLD, 24);
 
-        CustomBotao btnVisuAnimais = new CustomBotao("Visualizar animais disponivéis", e -> {
-            JOptionPane.showMessageDialog(null, "Mostrando animais...");
+        CustomBotao btnVisuAnimais = new CustomBotao("Visualizar Animais Disponíveis", e -> {
+            new MenuAnimaisDisponiveis(inv).mostrarTela();
         });
 
         CustomBotao btnSolicitarAdocao = new CustomBotao("Solicitar Adocao", e -> {

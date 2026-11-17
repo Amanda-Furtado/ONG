@@ -15,11 +15,12 @@ public class SistemaUsuario {
 
     public void mostrarUsuarios(){
         for(Usuario u : todosUsuarios){
-            System.out.printf(u.getNome() + ".\n");
+            System.out.printf(u.getNome() +  " - email: " + u.getEmail() + ".\n");
         }
     }
 
     public Usuario validarLogin(String email, String senha){
+        mostrarUsuarios();
         for (Usuario u : todosUsuarios){
             if(validarEmail(u, email) && u.validarSenha(senha)){
                 return u;

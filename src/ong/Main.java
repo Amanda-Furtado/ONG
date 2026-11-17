@@ -12,7 +12,6 @@ public class Main {
     public static void main (String args[]){
         SistemaUsuario sisUser = new SistemaUsuario();
         Inventario sisInventario = new Inventario();
-        MenuPrincipal mPrincipal = new MenuPrincipal(sisUser, sisInventario);
 
         Usuario voluntario1 = new Voluntario("Marina Gomes", "abc@gmail.com", "123456", "11122233344");
         Usuario veterinario1 = new Veterinario("Carla Machado", "vet.carlam@gmail.com", "abcdef", "12312312399");
@@ -60,6 +59,8 @@ public class Main {
         sisInventario.addAnimal(cachorro1);
         sisInventario.addAnimal(outro1);
         
+        MenuPrincipal mPrincipal = new MenuPrincipal(sisUser, sisInventario);
+
         mPrincipal.mostrarMenu();
 
     }
