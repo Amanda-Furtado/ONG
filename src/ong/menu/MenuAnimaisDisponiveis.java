@@ -3,6 +3,7 @@ package ong.menu;
 import ong.UI.*;
 import ong.animais.*;
 import ong.service.Inventario;
+import ong.usuario.Voluntario;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -14,23 +15,32 @@ import java.util.List;
 
 public class MenuAnimaisDisponiveis {
     private Inventario inv;
+    private Voluntario voluntarioLogado; // null se acessado pela tela inicial sem login
     private JTable tabAnimais;
     private DefaultTableModel modeloTabela;
-    private JTextField txtPesquisar;
+    private CustomTextField txtPesquisar;
     private String filtroEspecieAtual = "Todos";
 
+    // Construtor para visitantes (sem login)
     public MenuAnimaisDisponiveis(Inventario inv) {
+        this(inv, null);
+    }
+
+    // Construtor para voluntário logado
+    public MenuAnimaisDisponiveis(Inventario inv, Voluntario voluntarioLogado) {
         this.inv = inv;
+        this.voluntarioLogado = voluntarioLogado;
     }
 
     public void mostrarTela() {
         CustomFrame janela = new CustomFrame("Animais Disponíveis - Abrigo Amigos Fofos", 760, 700);
 
         JPanel painelPrincipal = new JPanel(new BorderLayout(16, 16));
+        painelPrincipal.setPreferredSize(new Dimension(720, 640));
         painelPrincipal.setBorder(BorderFactory.createEmptyBorder(16, 24, 16, 24));
         painelPrincipal.setOpaque(false);
 
-        // pesquisa/filtro
+        // Pesquisa/filtro
         JPanel painelTopo = new JPanel();
         painelTopo.setLayout(new BoxLayout(painelTopo, BoxLayout.Y_AXIS));
         painelTopo.setOpaque(false);
@@ -42,9 +52,9 @@ public class MenuAnimaisDisponiveis {
         painelPesquisa.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         CustomLabel lblPesquisar = new CustomLabel("Pesquisar:  ");
-        txtPesquisar = new JTextField(24);
+        txtPesquisar = new CustomTextField();
+        txtPesquisar.setPreferredSize(new Dimension(320, 36));
 
-        //filtra enquanto digita
         txtPesquisar.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) { atualizarTabela(); }
             public void removeUpdate(DocumentEvent e) { atualizarTabela(); }
@@ -54,7 +64,7 @@ public class MenuAnimaisDisponiveis {
         painelPesquisa.add(lblPesquisar);
         painelPesquisa.add(txtPesquisar);
 
-        //filtros por Espécie
+        // Filtros por Espécie
         JPanel painelFiltros = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 5));
         painelFiltros.setOpaque(false);
         painelFiltros.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -74,6 +84,12 @@ public class MenuAnimaisDisponiveis {
             filtroEspecieAtual = "Outros"; atualizarTabela();
         });
 
+        Font fonteFiltro = new Font("Quicksand", Font.BOLD, 14);
+        btnTodos.setFont(fonteFiltro);
+        btnCao.setFont(fonteFiltro);
+        btnGato.setFont(fonteFiltro);
+        btnOutros.setFont(fonteFiltro);
+
         painelFiltros.add(lblFiltro);
         painelFiltros.add(btnTodos);
         painelFiltros.add(btnCao);
@@ -86,12 +102,12 @@ public class MenuAnimaisDisponiveis {
         painelTopo.add(Box.createVerticalStrut(5));
         painelTopo.add(painelFiltros);
 
-        //tabela
+        // Tabela
         String[] colunas = {"ID", "Nome", "Espécie", "Idade", "Status"};
         modeloTabela = new DefaultTableModel(colunas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Impede edição direta na célula (acho que vou usar pro admin)
+                return false;
             }
         };
 
@@ -103,7 +119,7 @@ public class MenuAnimaisDisponiveis {
 
         JScrollPane scrollTabela = new JScrollPane(tabAnimais);
 
-        //botoes
+        // Botões
         JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 16, 4));
         painelBotoes.setOpaque(false);
 
@@ -140,12 +156,10 @@ public class MenuAnimaisDisponiveis {
         janela.setVisible(true);
     }
 
-    //atualiza as linhas da tabela aplicando pesquisa + filtro
     private void atualizarTabela() {
         modeloTabela.setRowCount(0);
         String termo = txtPesquisar.getText().trim().toLowerCase();
 
-        //especie
         List<Animal> listaFiltrada;
         if (filtroEspecieAtual.equals("Cachorro") || filtroEspecieAtual.equals("Gato")) {
             listaFiltrada = inv.filtrarPorEspecie(filtroEspecieAtual);
@@ -160,10 +174,9 @@ public class MenuAnimaisDisponiveis {
             listaFiltrada = inv.getAnimais();
         }
 
-        //texto digitado
         for (Animal a : listaFiltrada) {
             String status = a.getStatusAdocao().toLowerCase();
-            if (!status.contains("disponivel") && !status.contains("disponível")) { //NO ADMIN EU TIRO ISSO
+            if (!status.contains("disponivel") && !status.contains("disponível")) {
                 continue;
             }
             if (termo.isEmpty() || a.getNome().toLowerCase().contains(termo)) {
@@ -181,7 +194,6 @@ public class MenuAnimaisDisponiveis {
         }
     }
 
-    // Pega o objeto Animal escolhido na tabela
     private Animal getAnimalSelecionado(Component parent) {
         int linha = tabAnimais.getSelectedRow();
         if (linha == -1) {
@@ -192,15 +204,19 @@ public class MenuAnimaisDisponiveis {
         return inv.buscarPorId(idAnimal);
     }
 
-    // Mini formulario de adocao (vou tirar caso seja um voluntario logado)
     private void abrirDialogoAdocao(Component parent, Animal animal) {
-        JTextField txtNomeCandidato = new JTextField();
-        JTextField txtCpfCandidato = new JTextField();
+        CustomTextField txtNomeCandidato = new CustomTextField();
+        CustomTextField txtCpfCandidato = new CustomTextField();
+
+        if (voluntarioLogado != null) {
+            txtNomeCandidato.setText(voluntarioLogado.getNome());
+            txtNomeCandidato.setEditable(false);
+        }
 
         Object[] campos = {
-            "Animal selecionado: " + animal.getNome() + " (ID: " + animal.getId() + ")",
-            "Nome do Candidato:", txtNomeCandidato,
-            "CPF do Candidato:", txtCpfCandidato
+            new CustomLabel("Animal selecionado: " + animal.getNome() + " (ID: " + String.format("%02d", animal.getId()) + ")", Font.BOLD, 16),
+            new CustomLabel("Nome do Candidato:"), txtNomeCandidato,
+            new CustomLabel("CPF do Candidato:"), txtCpfCandidato
         };
 
         int opcao = JOptionPane.showConfirmDialog(parent, campos, "Solicitar Adoção", JOptionPane.OK_CANCEL_OPTION);
@@ -213,15 +229,21 @@ public class MenuAnimaisDisponiveis {
                 return;
             }
 
-            // ID aleatorio com base no tempo
-            int idSolicitacao = (int) (System.currentTimeMillis() % 10000);
-            boolean sucesso = inv.solicitarAdocao(idSolicitacao, animal.getId(), nome, cpf);
+            try {
+                int idSolicitacao = (int) (System.currentTimeMillis() % 10000);
+                boolean sucesso = inv.solicitarAdocao(idSolicitacao, animal.getId(), nome, cpf);
 
-            if (sucesso) {
-                JOptionPane.showMessageDialog(parent, "Solicitação registrada com sucesso!");
-                atualizarTabela();
-            } else {
-                JOptionPane.showMessageDialog(parent, "Não foi possível solicitar adoção (animal já adotado).", "Erro", JOptionPane.ERROR_MESSAGE);
+                if (sucesso) {
+                    JOptionPane.showMessageDialog(
+                        parent,
+                        "Solicitação #" + String.format("%04d", idSolicitacao) + " registrada com sucesso para " + animal.getNome() + "!",
+                        "Sucesso",
+                        JOptionPane.INFORMATION_MESSAGE
+                    );
+                    atualizarTabela();
+                }
+            } catch (IllegalArgumentException | IllegalStateException ex) {
+                JOptionPane.showMessageDialog(parent, ex.getMessage(), "Não foi possível solicitar", JOptionPane.WARNING_MESSAGE);
             }
         }
     }

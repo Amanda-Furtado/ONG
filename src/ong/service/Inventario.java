@@ -97,7 +97,7 @@ public class Inventario{
             throw new IllegalStateException("Erro: O animal " + animal.getNome() + " esta em tratamento critico e nao pode ser adotado.");
         }
 
-        if(!animal.getStatusAdocao().equalsIgnoreCase("Disponivel")){
+        if (!animal.getStatusAdocao().equalsIgnoreCase("Disponivel") && !animal.getStatusAdocao().equalsIgnoreCase("Disponível")) {
             throw new IllegalStateException("Erro: O animal " + animal.getNome() + " esta indisponivel para adocao (Status: " + animal.getStatusAdocao() + ").");
         }
 

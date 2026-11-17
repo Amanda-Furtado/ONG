@@ -22,7 +22,7 @@ public abstract class Usuario {
         return this.email;
     }
 
-    public String getCPF(){
+    public String getCpf(){
         return this.CPF;
     }
 
