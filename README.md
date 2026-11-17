@@ -1,0 +1,1 @@
+Obs: O GitHub talvez esteja meio estranho pq nós tivemos alguns problemas com os commits, então rolou muito de ter que copiar do notebook do victor, do meu notebook e do meu pc em alguns momentos, mas eu acho que deu certo.
