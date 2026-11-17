@@ -5,6 +5,7 @@ import ong.service.*;
 import ong.UI.*;
 
 import javax.swing.*;
+
 import java.awt.*;
 
 
@@ -19,33 +20,14 @@ public class MenuPrincipal {
 
     public void mostrarMenu(){
         CustomFrame janela = new CustomFrame("Login - Abrigo Amigos Fofos", 720, 480);
-        janela.setLayout(new BorderLayout());
 
-        // Textos
-        JPanel painelTexto = new JPanel();
-        painelTexto.setLayout(new BoxLayout(painelTexto, BoxLayout.Y_AXIS));
-        painelTexto.setBorder(BorderFactory.createEmptyBorder(40, 20, 20, 40));
+        CustomFormPanel painelConteudo = new CustomFormPanel(700, 480);
 
-        JLabel lblLinha1 = new JLabel("Bem vindo ao sistema do");
-        JLabel lblLinha2 = new JLabel("Abrigo Amigos Fofos");
-
-        Font fontePrincipal = new Font("Quicksand", Font.BOLD, 36);
-        lblLinha1.setFont(fontePrincipal);
-        lblLinha2.setFont(fontePrincipal);
+        CustomLabel lblLinha1 = new CustomLabel("Bem vindo ao sistema do", Font.BOLD, 34);
+        CustomLabel lblLinha2 = new CustomLabel("Abrigo Amigos Fofos", Font.BOLD, 34);
 
         lblLinha1.setAlignmentX(Component.CENTER_ALIGNMENT);
         lblLinha2.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        painelTexto.add(lblLinha1);
-        painelTexto.add(lblLinha2);
-
-        janela.add(painelTexto, BorderLayout.CENTER);
-        
-        // Botoes
-        JPanel painelBotoes = new JPanel();
-        painelBotoes.setLayout(new FlowLayout(FlowLayout.CENTER));
-        painelBotoes.setBorder(BorderFactory.createEmptyBorder(0, 0, 100, 0));
-
 
         CustomBotao btnEntrar = new CustomBotao("Entrar", e -> {
             new MenuEntrar(this.sisUser, this.inv).mostrarTela();
@@ -62,16 +44,21 @@ public class MenuPrincipal {
 
         CustomBotao btnSobreSis = new CustomBotao("Sobre o Sistema", e -> {
             JOptionPane.showMessageDialog(janela, "Sistema de Gerenciamento para ONG - Abrigo Amigos Fofos v1.0, feito por Amanda e Victor!");
-            // quando tiver uma janela eu boto um comando aq.
         });
        
+        btnEntrar.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnRegistrar.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnVisuAnimais.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnSobreSis.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        painelBotoes.add(btnEntrar);
-        painelBotoes.add(btnRegistrar);
-        painelBotoes.add(btnVisuAnimais);
-        painelBotoes.add(btnSobreSis);
+        painelConteudo.addComEspacamento(lblLinha1, 5);
+        painelConteudo.addComEspacamento(lblLinha2, 60);
+        painelConteudo.addComEspacamento(btnEntrar, 8);
+        painelConteudo.addComEspacamento(btnRegistrar, 8);
+        painelConteudo.addComEspacamento(btnVisuAnimais, 8);
+        painelConteudo.addComEspacamento(btnSobreSis, 8);
 
-        janela.add(painelBotoes, BorderLayout.SOUTH);
+        janela.setConteudo(painelConteudo);
         janela.setExtendedState(JFrame.MAXIMIZED_BOTH);
         janela.setVisible(true);
     }
