@@ -1,9 +1,8 @@
 package ong.sistema;
 
 import java.util.ArrayList;
-import java.util.List;
-
 import ong.usuario.Usuario;
+import ong.usuario.Voluntario;
 
 
 public class SistemaUsuario {
@@ -30,6 +29,16 @@ public class SistemaUsuario {
 
     public boolean validarEmail(Usuario u, String email){
         return u.getEmail().equalsIgnoreCase(email.trim());
+    }
+
+    public int getQuantidadeVoluntarios() {
+        int total = 0;
+        for (Usuario u : todosUsuarios) {
+            if (u instanceof Voluntario) {
+                total++;
+            }
+        }
+        return total;
     }
 
 }

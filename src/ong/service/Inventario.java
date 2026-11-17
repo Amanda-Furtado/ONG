@@ -2,6 +2,7 @@ package ong.service;
 
 import java.util.ArrayList;
 import ong.animais.*;
+import ong.sistema.SistemaUsuario;
 import ong.usuario.*;
 
 public class Inventario{
@@ -325,6 +326,100 @@ public class Inventario{
         }
         System.out.println("Erro: Animal nao encontrado.");
         return false;
+    }
+    // FIM MODULO 4 --------------------------
+    // MODULO 7 ----------------------------------
+
+    public int getQuantidadeAnimaisResgatados(){
+        return animais.size();
+    }
+
+    public int getQuantidadeAdocoesRealizadas(){
+        int total = 0;
+        for (SolicitacaoAdocao sol : solicitacoes){
+            if (sol.getStatus().equalsIgnoreCase("Aprovado")){
+                total++;
+            }
+        }
+        return total;
+    }
+
+    public String getEspeciesMaisResgatadas(){
+        if (animais.isEmpty()) {
+            return "Nenhum animal registrado.";
+        }
+
+        int qtdCachorros = 0;
+        int qtdGatos = 0;
+        int qtdOutros = 0;
+
+        for (Animal a : animais) {
+            if (a instanceof Cachorro) {
+                qtdCachorros++;
+            } else if (a instanceof Gato) {
+                qtdGatos++;
+            } else {
+                qtdOutros++;
+            }
+        }
+
+        String maisResgatada;
+        if (qtdCachorros >= qtdGatos && qtdCachorros >= qtdOutros){
+            maisResgatada = "Cachorro";
+        } else if (qtdGatos >= qtdCachorros && qtdGatos >= qtdOutros){
+            maisResgatada = "Gato";
+        } else {
+            maisResgatada = "Outros";
+        }
+
+        return maisResgatada + " (Cachorros: " + qtdCachorros +
+               " | Gatos: " + qtdGatos +
+               " | Outros: " + qtdOutros + ")";
+    }
+
+    public double calcularTaxaAdocaoMensal(int totalMesesPeriodo){
+        if (totalMesesPeriodo <= 0 || animais.isEmpty()) {
+            return 0.0;
+        }
+        int adocoes = getQuantidadeAdocoesRealizadas();
+        double mediaMensal = (double) adocoes / totalMesesPeriodo;
+        return (mediaMensal / animais.size()) * 100.0;
+    }
+    public int getNumeroVoluntariosAtivos(SistemaUsuario sisUser){
+        return sisUser.getQuantidadeVoluntarios();
+    }
+
+    public ArrayList<Animal> getAnimaisEmTratamento(){
+        ArrayList<Animal> emTratamento = new ArrayList<>();
+        for (Animal a : animais) {
+            String saude = a.getEstadoSaude().toLowerCase();
+            if (!saude.equals("saudavel") && !saude.equals("saudável")){
+                emTratamento.add(a);
+            }
+        }
+        return emTratamento;
+    }
+    public String gerarRelatorioGeral(SistemaUsuario sisUser, int mesesOperacao){
+        String relatorio = "=== RELATÓRIO E ESTATÍSTICAS DA ONG ===\n\n";
+        relatorio += "• Quantidade de animais resgatados: " + getQuantidadeAnimaisResgatados() + "\n";
+        relatorio += "• Quantidade de adoções realizadas: " + getQuantidadeAdocoesRealizadas() + "\n";
+        relatorio += "• Espécie mais resgatada: " + getEspeciesMaisResgatadas() + "\n";
+        relatorio += String.format("• Taxa de adoção mensal (%d meses): %.2f%%\n", mesesOperacao, calcularTaxaAdocaoMensal(mesesOperacao));
+        relatorio += "• Número de voluntários ativos: " + getNumeroVoluntariosAtivos(sisUser) + "\n\n";
+
+        relatorio += "--- Animais em Tratamento ---\n";
+        ArrayList<Animal> tratamento = getAnimaisEmTratamento();
+        if (tratamento.isEmpty()){
+            relatorio += "Nenhum animal em tratamento no momento.\n";
+        } else{
+            for (Animal a : tratamento){
+                relatorio += "- ID " + a.getId() +
+                             " | " + a.getNome() +
+                             " (" + a.getEspecie() + ")" +
+                             " | Estado: " + a.getEstadoSaude() + "\n";
+            }
+        }
+        return relatorio;
     }
 }
 
