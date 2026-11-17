@@ -15,18 +15,16 @@ import java.util.List;
 
 public class MenuAnimaisDisponiveis {
     private Inventario inv;
-    private Voluntario voluntarioLogado; // null se acessado pela tela inicial sem login
+    private Voluntario voluntarioLogado;
     private JTable tabAnimais;
     private DefaultTableModel modeloTabela;
     private CustomTextField txtPesquisar;
     private String filtroEspecieAtual = "Todos";
 
-    // Construtor para visitantes (sem login)
     public MenuAnimaisDisponiveis(Inventario inv) {
         this(inv, null);
     }
 
-    // Construtor para voluntário logado
     public MenuAnimaisDisponiveis(Inventario inv, Voluntario voluntarioLogado) {
         this.inv = inv;
         this.voluntarioLogado = voluntarioLogado;
@@ -40,7 +38,6 @@ public class MenuAnimaisDisponiveis {
         painelPrincipal.setBorder(BorderFactory.createEmptyBorder(16, 24, 16, 24));
         painelPrincipal.setOpaque(false);
 
-        // Pesquisa/filtro
         JPanel painelTopo = new JPanel();
         painelTopo.setLayout(new BoxLayout(painelTopo, BoxLayout.Y_AXIS));
         painelTopo.setOpaque(false);
@@ -64,7 +61,6 @@ public class MenuAnimaisDisponiveis {
         painelPesquisa.add(lblPesquisar);
         painelPesquisa.add(txtPesquisar);
 
-        // Filtros por Espécie
         JPanel painelFiltros = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 5));
         painelFiltros.setOpaque(false);
         painelFiltros.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -102,7 +98,6 @@ public class MenuAnimaisDisponiveis {
         painelTopo.add(Box.createVerticalStrut(5));
         painelTopo.add(painelFiltros);
 
-        // Tabela
         String[] colunas = {"ID", "Nome", "Espécie", "Idade", "Status"};
         modeloTabela = new DefaultTableModel(colunas, 0) {
             @Override
@@ -119,7 +114,6 @@ public class MenuAnimaisDisponiveis {
 
         JScrollPane scrollTabela = new JScrollPane(tabAnimais);
 
-        // Botões
         JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 16, 4));
         painelBotoes.setOpaque(false);
 
@@ -227,6 +221,16 @@ public class MenuAnimaisDisponiveis {
             if (nome.isEmpty() || cpf.isEmpty()) {
                 JOptionPane.showMessageDialog(parent, "Preencha nome e CPF.", "Erro", JOptionPane.ERROR_MESSAGE);
                 return;
+            }
+
+            if (voluntarioLogado != null) {
+                String cpfDigitadoLimpo = cpf.replaceAll("[^0-9]", "");
+                String cpfVoluntarioLimpo = voluntarioLogado.getCpf().replaceAll("[^0-9]", "");
+                if (!cpfDigitadoLimpo.equals(cpfVoluntarioLimpo)) {
+                    JOptionPane.showMessageDialog(parent, "O CPF informado não corresponde ao do voluntário logado.", "CPF Inválido", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                cpf = voluntarioLogado.getCpf();
             }
 
             try {
